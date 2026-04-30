@@ -8,26 +8,26 @@ Source spec: `docs/specs/nexi_student_chatbot_spec0.2.md`
 - This file mirrors the issue structure so planning remains readable in the repo.
 - When an issue changes scope or status, update the relevant section here in the same PR/commit.
 
-## Issues To Create
+## Issue Tracker
 
-Created GitHub issues:
+GitHub issues:
 
-| Issue | Title | Milestone |
-|---|---|---|
-| [#1](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/1) | `[v0.2] Verified student session with simulated OTP` | v0.2 Phase 1 |
-| [#4](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/4) | `[v0.2] Personalised dashboard and dynamic buttons` | v0.2 Phase 1 |
-| [#3](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/3) | `[v0.2] Canvas MCP adapter and student-safe tool normalization` | v0.2 Phase 1 |
-| [#2](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/2) | `[v0.2] Assignments, deadlines, grades, announcements, and enrolments` | v0.2 Phase 2 |
-| [#8](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/8) | `[v0.2] Course Q&A and context maintenance` | v0.2 Phase 2 |
-| [#7](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/7) | `[v0.2] Guardrails, privacy, and production hardening` | v0.2 Phase 3 |
-| [#6](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/6) | `[v0.2] Acceptance tests and regression coverage` | v0.2 Phase 3 |
-| [#5](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/5) | `[implementation record] Prototype v0.1 Canvas MCP chatbot` | v0.2 Phase 1 |
+| Issue | Title | Milestone | State |
+|---|---|---|---|
+| [#1](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/1) | `[v0.2] Verified student session with simulated OTP` | v0.2 Phase 1 | Closed |
+| [#4](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/4) | `[v0.2] Personalised dashboard and dynamic buttons` | v0.2 Phase 1 | Closed |
+| [#3](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/3) | `[v0.2] Canvas MCP adapter and student-safe tool normalization` | v0.2 Phase 1 | Closed |
+| [#2](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/2) | `[v0.2] Assignments, deadlines, grades, announcements, and enrolments` | v0.2 Phase 2 | Open |
+| [#8](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/8) | `[v0.2] Course Q&A and context maintenance` | v0.2 Phase 2 | Open |
+| [#7](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/7) | `[v0.2] Guardrails, privacy, and production hardening` | v0.2 Phase 3 | Open |
+| [#6](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/6) | `[v0.2] Acceptance tests and regression coverage` | v0.2 Phase 3 | Open |
+| [#5](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/5) | `[implementation record] Prototype v0.1 Canvas MCP chatbot` | v0.2 Phase 1 | Closed |
 
 ### 1. Verified student session with simulated OTP
 
 GitHub issue: [#1](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/1)
 
-Status: implemented in first v0.2 branch pass
+Status: closed on GitHub. Implemented in the first v0.2 branch pass.
 
 Tasks:
 
@@ -48,13 +48,13 @@ Acceptance tests:
 - [x] Incorrect OTP does not verify session.
 - [x] Prototype OTP mode cannot run in production.
 
-Note: automated regression coverage remains tracked in issue #6. The live correct-OTP smoke path requires a known Canvas test student email.
+Note: automated regression coverage remains tracked in issue #6. Production auth hardening remains tracked in issue #7.
 
 ### 2. Personalised dashboard and dynamic buttons
 
 GitHub issue: [#4](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/4)
 
-Status: partially implemented in first v0.2 branch pass
+Status: closed on GitHub. Implemented as the v0.2 dashboard/action shell.
 
 Tasks:
 
@@ -67,15 +67,15 @@ Tasks:
 
 Acceptance tests:
 
-- [ ] Active student sees enabled course buttons.
-- [ ] Missing data renders disabled action with reason.
+- [x] Active student sees enabled course buttons.
+- [x] Missing data renders disabled action with reason.
 - [x] Selected course context persists across actions.
 
 ### 3. Canvas MCP adapter and student-safe tool normalization
 
 GitHub issue: [#3](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/3)
 
-Status: implemented for profile, courses, enrolments, and grades/results
+Status: closed on GitHub. Implemented for profile, courses, enrolments, grades/results, and safe normalization of planned academic data shapes.
 
 Tasks:
 
@@ -160,7 +160,7 @@ Acceptance tests:
 
 GitHub issue: [#5](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/5)
 
-Status: implemented
+Status: closed on GitHub. Implemented and retained as the v0.1 history anchor.
 
 Documented features:
 

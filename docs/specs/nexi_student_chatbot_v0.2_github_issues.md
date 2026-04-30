@@ -25,6 +25,21 @@ Created GitHub milestones:
 2. [`v0.2 Phase 2 - Academic data flows`](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/2)
 3. [`v0.2 Phase 3 - Security and QA`](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/3)
 
+## Current Issue Status
+
+Updated 2026-04-30 after the first closeout pass.
+
+| Issue | State | Closeout note |
+|---|---|---|
+| [#1](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/1) | Closed | v0.2 prototype email, OTP, and `StudentSession` flow implemented. Automated regression coverage remains in #6; production auth hardening remains in #7. |
+| [#4](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/4) | Closed | Verified dashboard, dynamic actions, disabled states, selected course context, and constrained mobile-friendly chat shell implemented. |
+| [#3](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/3) | Closed | Server-only Canvas MCP adapter and student-safe tool normalization implemented. |
+| [#2](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/2) | Open | Assignments, deadlines, announcements, richer academic data, and scoped summaries still need implementation. |
+| [#8](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/8) | Open | Course selection exists; natural-language course Q&A and ambiguity handling still need implementation. |
+| [#7](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/7) | Open | Production hardening, privacy review, rate limiting, and auth migration path remain. |
+| [#6](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/6) | Open | Automated acceptance and regression coverage remains. |
+| [#5](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/5) | Closed | v0.1 implementation record documented and retained as history. |
+
 ## Issue 1: [v0.2] Verified student session with simulated OTP
 
 GitHub issue: [#1](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/1)
