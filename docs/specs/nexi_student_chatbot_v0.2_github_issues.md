@@ -21,7 +21,7 @@ Suggested labels:
 
 Created GitHub milestones:
 
-1. [`v0.2 Phase 1 - Verified student dashboard`](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/1)
+1. [`v0.2 Phase 1 - Verified student dashboard`](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/1) - Closed
 2. [`v0.2 Phase 2 - Academic data flows`](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/2)
 3. [`v0.2 Phase 3 - Security and QA`](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/3)
 
