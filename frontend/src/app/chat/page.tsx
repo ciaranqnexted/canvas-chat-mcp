@@ -2,8 +2,8 @@ import ChatWindow from '@/components/features/chat/ChatWindow'
 
 export default function ChatPage() {
   return (
-    <main className="min-h-screen bg-gray-100 px-3 py-3 text-gray-950 sm:px-6 sm:py-6 lg:py-8">
-      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-5xl flex-col gap-3 sm:min-h-[calc(100vh-3rem)] sm:gap-5">
+    <main className="min-h-screen min-h-[100dvh] bg-gray-100 px-3 py-3 text-gray-950 sm:px-6 sm:py-6 lg:py-8">
+      <div className="mx-auto flex min-h-[calc(100dvh-1.5rem)] max-w-5xl flex-col gap-3 sm:min-h-[calc(100dvh-3rem)] sm:gap-5">
         <header className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600 text-sm font-bold text-white shadow-sm">
@@ -21,7 +21,7 @@ export default function ChatPage() {
         </header>
 
         <section className="flex min-h-0 flex-1 items-center justify-center">
-          <div className="flex h-[calc(100vh-8.5rem)] w-full max-w-3xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm sm:h-[min(760px,calc(100vh-10rem))]">
+          <div className="flex h-[calc(100dvh-8.5rem)] w-full max-w-3xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm sm:h-[min(760px,calc(100dvh-10rem))]">
             <ChatWindow />
           </div>
         </section>
