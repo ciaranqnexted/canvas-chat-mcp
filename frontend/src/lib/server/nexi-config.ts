@@ -33,6 +33,10 @@ function requiredBooleanEnv(name: string): boolean {
   throw new Error(`${name} must be true or false`)
 }
 
+function optionalBooleanEnv(name: string): boolean {
+  return normalizedEnv(name)?.toLowerCase() === 'true'
+}
+
 export function getNexiAuthConfig(): NexiAuthConfig {
   const realOtpEnabled = requiredBooleanEnv('NEXI_OTP')
   const prototypeOtp = !realOtpEnabled
@@ -51,8 +55,9 @@ export function getNexiAuthConfig(): NexiAuthConfig {
 
 export function assertNexiRuntimeConfig(): void {
   const config = getNexiAuthConfig()
+  const allowPrototypeOtp = optionalBooleanEnv('NEXI_ALLOW_PROTOTYPE_OTP')
 
-  if (process.env.NODE_ENV === 'production' && config.prototypeOtp) {
-    throw new Error('Prototype OTP mode must not be enabled in production')
+  if (process.env.NODE_ENV === 'production' && config.prototypeOtp && !allowPrototypeOtp) {
+    throw new Error('Prototype OTP mode must not be enabled in production without NEXI_ALLOW_PROTOTYPE_OTP=true')
   }
 }

@@ -52,6 +52,21 @@ For local document search, place Markdown, text, JSON, or CSV files in `local-do
 
 For Canvas profile lookup, set `CANVAS_MCP_URL`, `CANVAS_MCP_CANVAS_URL`, `CANVAS_MCP_TOKEN`, and the `NEXI_*` prototype verification variables in `frontend/.env.local`. See [Environment Variables](./docs/environment.md).
 
+## Vercel Deployment
+
+This repo keeps the Next.js app in `frontend/`. The root [vercel.json](./vercel.json) tells Vercel to install and build from that folder.
+
+Set the same server-side variables in the Vercel project environment that you use locally, including:
+
+- `CANVAS_MCP_URL`
+- `CANVAS_MCP_API_PATH`
+- `CANVAS_MCP_CANVAS_URL`
+- `CANVAS_MCP_TOKEN`
+- `CANVAS_MCP_BEARER_TOKEN` if the MCP deployment requires it
+- `NEXI_OTP`
+- `NEXI_DEV_OTP` or `NEXI_OTP_DEFAULT`
+- `NEXI_ALLOW_PROTOTYPE_OTP=true` while testing simulated OTP on Vercel
+
 ## Project Structure
 
 ```text

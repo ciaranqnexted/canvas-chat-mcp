@@ -83,16 +83,23 @@ Set them in `frontend/.env.local`, restart `npm run dev`, and click **Sign in wi
 | Variable | Where to get it | Used by | Notes |
 |---|---|---|---|
 | `NEXI_OTP` | `frontend/.env.local` | Student verification | Required. Set `false` for the simulated v0.2 OTP prototype. Real OTP delivery is future work. |
+| `NEXI_ALLOW_PROTOTYPE_OTP` | Vercel/project env | Deployed prototype testing | Set `true` only when testing the simulated OTP flow on Vercel. Leave unset/false for real production. |
 | `NEXI_OTP_EMAIL` | Your dev inbox | Prototype OTP note | Documents where real OTP would be delivered later; no email is sent in v0.2. |
 | `NEXI_DEV_OTP` | `frontend/.env.local` | Simulated OTP check | Required when `NEXI_OTP=false`; `NEXI_OTP_DEFAULT` is also accepted as a local alias. |
 
 Production rule:
 
 ```ts
-if (process.env.NODE_ENV === 'production' && process.env.NEXI_OTP === 'false') {
+if (
+  process.env.NODE_ENV === 'production' &&
+  process.env.NEXI_OTP === 'false' &&
+  process.env.NEXI_ALLOW_PROTOTYPE_OTP !== 'true'
+) {
   throw new Error('Prototype OTP mode must not be enabled in production')
 }
 ```
+
+For a temporary Vercel-hosted prototype, set `NEXI_ALLOW_PROTOTYPE_OTP=true` in the Vercel project environment. Remove it before any real production use.
 
 ## Why Canvas Email Lookup Cannot Reach MCP
 
