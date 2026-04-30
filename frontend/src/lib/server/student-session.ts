@@ -29,6 +29,23 @@ export function getStudentSession(sessionId: string): StudentSession | undefined
   return studentSessions.get(sessionId)
 }
 
+export function selectStudentCourse(
+  sessionId: string,
+  selectedCourseId: string
+): StudentSession | undefined {
+  const session = studentSessions.get(sessionId)
+  if (!session) return undefined
+
+  const updatedSession = {
+    ...session,
+    selectedCourseId,
+    updatedAt: Date.now(),
+  }
+
+  studentSessions.set(sessionId, updatedSession)
+  return updatedSession
+}
+
 export function startPendingStudentSession(
   sessionId: string,
   profile: CanvasUserProfile
@@ -99,4 +116,3 @@ export function verifyStudentOtp(
     session: failedSession,
   }
 }
-

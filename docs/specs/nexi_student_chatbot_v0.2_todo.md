@@ -62,14 +62,14 @@ Tasks:
 - [x] Render post-verification profile summary.
 - [x] Add top-level buttons: Profile, Courses, Enrolments, Assignments, Grades, Announcements, Deadlines, Support.
 - [x] Add disabled states with reasons.
-- [ ] Preserve selected course in session state.
+- [x] Preserve selected course in session state.
 - [x] Keep buttons compact and usable on mobile.
 
 Acceptance tests:
 
 - [ ] Active student sees enabled course buttons.
 - [ ] Missing data renders disabled action with reason.
-- [ ] Selected course context persists across actions.
+- [x] Selected course context persists across actions.
 
 ### 3. Canvas MCP adapter and student-safe tool normalization
 
@@ -120,19 +120,19 @@ Acceptance tests:
 
 GitHub issue: [#8](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/8)
 
-Status: planned
+Status: partially implemented
 
 Tasks:
 
-- [ ] Let student select a course.
-- [ ] Store `selectedCourseId` in `StudentSession`.
+- [x] Let student select a course.
+- [x] Store `selectedCourseId` in `StudentSession`.
 - [ ] Route natural-language course questions through selected context.
 - [ ] Ask for clarification when multiple courses match.
 - [ ] Return grounded answers from Canvas MCP or local docs.
 
 Acceptance tests:
 
-- [ ] Selected course context maintained.
+- [x] Selected course context maintained.
 - [ ] Ambiguous course query asks for clarification.
 - [ ] Unsupported question does not fabricate.
 

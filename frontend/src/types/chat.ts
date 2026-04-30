@@ -11,6 +11,7 @@ export type MessageSource =
 export type ChatIntent =
   | 'lookup_profile'
   | 'verify_otp'
+  | 'select_course'
   | 'view_profile'
   | 'see_courses'
   | 'see_enrolments'
@@ -26,6 +27,10 @@ export interface ChatAction {
   label: string
   disabled?: boolean
   reason?: string
+  payload?: {
+    course_id?: string
+    course_name?: string
+  }
 }
 
 export interface CanvasUserProfile {
@@ -78,6 +83,7 @@ export interface SendMessageRequest {
   message: string
   mode?: ChatMode
   intent?: ChatIntent
+  action_payload?: ChatAction['payload']
 }
 
 export interface SendMessageResponse {

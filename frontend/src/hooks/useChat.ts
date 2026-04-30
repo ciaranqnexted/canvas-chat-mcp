@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
-import type { Message, ChatSession, ChatMode, ChatIntent } from '@/types/chat'
+import type { Message, ChatSession, ChatMode, ChatIntent, ChatAction } from '@/types/chat'
 import { sendMessage } from '@/lib/api'
 
 function newId(): string {
@@ -10,7 +10,7 @@ function newId(): string {
 
 export function useChat(mode: ChatMode): {
   session: ChatSession
-  send: (content: string, intent?: ChatIntent) => Promise<void>
+  send: (content: string, intent?: ChatIntent, actionPayload?: ChatAction['payload']) => Promise<void>
 } {
   const sessionId = useRef<string>(newId())
 
@@ -20,7 +20,11 @@ export function useChat(mode: ChatMode): {
     isLoading: false,
   })
 
-  const send = useCallback(async (content: string, intent?: ChatIntent) => {
+  const send = useCallback(async (
+    content: string,
+    intent?: ChatIntent,
+    actionPayload?: ChatAction['payload']
+  ) => {
     const userMessage: Message = {
       id: newId(),
       role: 'user',
@@ -40,6 +44,7 @@ export function useChat(mode: ChatMode): {
         message: content,
         mode,
         intent,
+        action_payload: actionPayload,
       })
 
       const assistantMessage: Message = {

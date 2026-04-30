@@ -30,9 +30,9 @@ export default function MessageBubble({ message, onAction }: Props) {
         )}
         {!isUser && message.actions && message.actions.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {message.actions.map(action => (
+            {message.actions.map((action, index) => (
               <button
-                key={action.id}
+                key={`${action.id}-${action.payload?.course_id ?? index}`}
                 type="button"
                 onClick={() => {
                   if (!action.disabled) onAction?.(action)

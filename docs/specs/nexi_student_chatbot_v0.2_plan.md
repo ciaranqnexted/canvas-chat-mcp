@@ -192,4 +192,5 @@ First v0.2 branch pass (`feat/nexi-v0.2`):
 - Moved raw Canvas MCP tool calls behind a student-safe adapter.
 - Reworked Canvas chat flow into email lookup -> OTP -> verified dashboard.
 - Added dashboard buttons with disabled reasons for MCP capabilities that are not available yet.
-- Kept assignments, deadlines, announcements, selected course context, and Q&A as the next implementation slice.
+- Added course-selection actions from returned course data and stored `selectedCourseId` in the student session.
+- Kept assignments, deadlines, announcements, and natural-language course Q&A as the next implementation slice.

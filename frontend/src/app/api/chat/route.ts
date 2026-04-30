@@ -2,15 +2,18 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import type { ChatIntent } from '@/types/chat'
+import type { ChatAction, ChatIntent } from '@/types/chat'
 import { assertNexiRuntimeConfig, getNexiAuthConfig } from '@/lib/server/nexi-config'
 import {
   getStudentSession,
+  selectStudentCourse,
   startPendingStudentSession,
   verifyStudentOtp,
   type StudentSession,
 } from '@/lib/server/student-session'
 import {
+  courseSelectionActions,
+  formatCourseSelected,
   formatCourses,
   formatEnrolments,
   formatExamResults,
@@ -111,7 +114,8 @@ function canvasResponse(
   sessionId: string,
   reply: string,
   session?: StudentSession,
-  iterationCount = 0
+  iterationCount = 0,
+  actions?: ChatAction[]
 ) {
   return NextResponse.json({
     session_id: sessionId,
@@ -119,7 +123,7 @@ function canvasResponse(
     source: 'canvas_mcp',
     iteration_count: iterationCount,
     profile: session?.profile,
-    actions: session?.verified ? profileActions(session.profile) : undefined,
+    actions: actions ?? (session?.verified ? profileActions(session.profile) : undefined),
   })
 }
 
@@ -142,7 +146,8 @@ async function handleVerifiedCanvasMessage(
   sessionId: string,
   session: StudentSession,
   message: string,
-  intent?: ChatIntent
+  intent?: ChatIntent,
+  actionPayload?: ChatAction['payload']
 ) {
   const effectiveIntent = intent ?? inferCanvasIntent(message)
   const actions = profileActions(session.profile)
@@ -170,12 +175,39 @@ async function handleVerifiedCanvasMessage(
 
   if (effectiveIntent === 'see_courses') {
     const courses = await getCoursesForProfile(session.profile)
-    return canvasResponse(sessionId, formatCourses(courses), session, 1)
+    return canvasResponse(
+      sessionId,
+      formatCourses(courses),
+      session,
+      1,
+      [...courseSelectionActions(courses), ...actions]
+    )
   }
 
   if (effectiveIntent === 'see_enrolments') {
     const courses = await getCoursesForProfile(session.profile)
     return canvasResponse(sessionId, formatEnrolments(courses), session, 1)
+  }
+
+  if (effectiveIntent === 'select_course') {
+    const selectedCourseId = actionPayload?.course_id
+
+    if (!selectedCourseId) {
+      return canvasResponse(
+        sessionId,
+        'I could not select that course because the course id was missing. Choose Courses again and select a course from the returned options.',
+        session,
+        0
+      )
+    }
+
+    const updatedSession = selectStudentCourse(sessionId, selectedCourseId) ?? session
+    return canvasResponse(
+      sessionId,
+      formatCourseSelected(actionPayload?.course_name ?? 'This course'),
+      updatedSession,
+      0
+    )
   }
 
   if (effectiveIntent === 'view_grades' || effectiveIntent === 'view_exam_results') {
@@ -208,6 +240,9 @@ export async function POST(request: NextRequest) {
   const sessionId = typeof body.session_id === 'string' ? body.session_id : crypto.randomUUID()
   const mode = body.mode === 'canvas' ? 'canvas' : 'local'
   const intent = typeof body.intent === 'string' ? body.intent as ChatIntent : undefined
+  const actionPayload = body.action_payload && typeof body.action_payload === 'object'
+    ? body.action_payload as ChatAction['payload']
+    : undefined
 
   if (mode === 'canvas') {
     try {
@@ -217,7 +252,7 @@ export async function POST(request: NextRequest) {
       const existingSession = getStudentSession(sessionId)
 
       if (existingSession?.verified) {
-        return handleVerifiedCanvasMessage(sessionId, existingSession, body.message, intent)
+        return handleVerifiedCanvasMessage(sessionId, existingSession, body.message, intent, actionPayload)
       }
 
       if (existingSession?.otpRequested && !isLikelyEmail(body.message)) {

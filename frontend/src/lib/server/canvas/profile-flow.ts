@@ -10,6 +10,7 @@ import {
 } from './student-adapter'
 
 export type CanvasProfileActionId =
+  | 'select_course'
   | 'view_profile'
   | 'see_courses'
   | 'see_enrolments'
@@ -25,6 +26,10 @@ export interface CanvasProfileAction {
   label: string
   disabled?: boolean
   reason?: string
+  payload?: {
+    course_id?: string
+    course_name?: string
+  }
 }
 
 export function isLikelyEmail(value: string): boolean {
@@ -41,6 +46,16 @@ function disabledAction(
 
 function hasCanvasUser(profile: CanvasUserProfile): boolean {
   return Boolean(canvasUserId(profile))
+}
+
+function courseId(course: CanvasCourseSummary, index: number): string | undefined {
+  const id = course.course_id ?? course.id
+  if (id !== undefined && id !== null) return String(id)
+  return course.course_name || course.name ? `course-${index + 1}` : undefined
+}
+
+function courseName(course: CanvasCourseSummary): string {
+  return course.course_name || course.name || 'Untitled course'
 }
 
 export function profileActions(profile: CanvasUserProfile): CanvasProfileAction[] {
@@ -88,6 +103,27 @@ export async function getExamResultsForProfile(
   return getCanvasExamResults(profile)
 }
 
+export function courseSelectionActions(courses: CanvasCourseSummary[]): CanvasProfileAction[] {
+  return courses
+    .map((course, index): CanvasProfileAction | null => {
+      const id = courseId(course, index)
+      if (!id) return null
+
+      const name = courseName(course)
+
+      return {
+        id: 'select_course',
+        label: `Use ${name}`,
+        payload: {
+          course_id: id,
+          course_name: name,
+        },
+      }
+    })
+    .filter((action): action is CanvasProfileAction => action !== null)
+    .slice(0, 8)
+}
+
 export function formatOtpPrompt(profile: CanvasUserProfile): string {
   const name = profile.name ? ` for ${profile.name}` : ''
 
@@ -133,10 +169,12 @@ export function formatCourses(courses: CanvasCourseSummary[]): string {
     'Here are the courses I found:',
     '',
     ...courses.map((course, index) => {
-      const name = course.course_name || course.name || 'Untitled course'
+      const name = courseName(course)
       const status = course.status ? ` (${course.status})` : ''
       return `${index + 1}. ${name}${status}`
     }),
+    '',
+    'Select a course to keep it as the current context.',
   ].join('\n')
 }
 
@@ -163,10 +201,18 @@ export function formatEnrolments(courses: CanvasCourseSummary[]): string {
     'Here are the enrolments I found:',
     '',
     ...courses.map((course, index) => {
-      const name = course.course_name || course.name || 'Untitled course'
+      const name = courseName(course)
       const status = course.status || course.workflow_state || 'status not supplied'
       return `${index + 1}. ${name} - ${status}`
     }),
+  ].join('\n')
+}
+
+export function formatCourseSelected(courseName: string): string {
+  return [
+    `${courseName} is now the current course context.`,
+    '',
+    'You can ask about this course, or choose another dashboard option. Course-specific Q&A will be expanded as the next MCP tools come online.',
   ].join('\n')
 }
 

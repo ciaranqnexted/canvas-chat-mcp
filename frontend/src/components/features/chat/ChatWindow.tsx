@@ -42,7 +42,7 @@ export default function ChatWindow() {
 
   const handleAction = (action: ChatAction) => {
     if (action.disabled) return
-    send(action.label, action.id)
+    send(action.label, action.id, action.payload)
   }
 
   return (
