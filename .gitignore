@@ -1,0 +1,53 @@
+# ─── Environment ─────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.production
+
+# ─── Agent working files ─────────────────────────────────────────────────────
+.agent-work/
+.claude/
+.codex/
+
+# ─── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ─── Node ────────────────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# ─── Local document data ─────────────────────────────────────────────────────
+.data/
+frontend/.data/
+local-documents/*
+!local-documents/README.md
+
+# ─── Evals & batch output ────────────────────────────────────────────────────
+prompts/evals/outputs/
+*.eval.log
+*.parquet
+checkpoints/
+
+# ─── Secrets ─────────────────────────────────────────────────────────────────
+*.pem
+*.key
+secrets/
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── OS ──────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
