@@ -81,12 +81,18 @@ function totalEnrollmentCount(profile: CanvasUserProfile): number {
 function formatProfileWelcome(profile: CanvasUserProfile): string {
   const name = profile.name || 'there'
   const accountName = profile.canvas_account_name || 'Canvas'
-  const sisId = profile.sis_id || 'not returned by Canvas'
+  const sisId = profile.sis_user_id || profile.sis_id
+  const canvasId = canvasUserId(profile)
+  const studentIdLine = sisId
+    ? `Your SIS ID is ${sisId}.`
+    : canvasId
+      ? `Your SIS ID was not returned by Canvas. I will use Canvas user ID ${canvasId} for this session.`
+      : 'Your SIS ID was not returned by Canvas.'
   const timezone = profile.timezone || 'not returned by Canvas'
 
   return [
     `Welcome ${name}, to the ${accountName} chatbot.`,
-    `Your SIS ID is ${sisId}.`,
+    studentIdLine,
     `Your selected time zone is ${timezone}.`,
     `You have ${activeCourseCount(profile)} active courses and a total of ${totalEnrollmentCount(profile)} enrollments.`,
     'Wishing you well in your learning journey with NextEd.',

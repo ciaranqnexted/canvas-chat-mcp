@@ -36,8 +36,10 @@ export interface ChatAction {
 export interface CanvasUserProfile {
   user_id?: string | number
   id?: string | number
+  canvas_user_id?: string | number
   name?: string
   email?: string
+  sis_user_id?: string
   sis_id?: string
   canvas_account_name?: string
   status?: string

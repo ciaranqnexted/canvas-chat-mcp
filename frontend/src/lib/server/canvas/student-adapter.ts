@@ -7,6 +7,8 @@ export interface CanvasCourseSummary {
   name?: string
   status?: string
   workflow_state?: string
+  sis_user_id?: string
+  sis_id?: string
 }
 
 export interface CanvasCompletedModule {
@@ -46,8 +48,10 @@ export interface CanvasAnnouncementSummary {
 export interface CanvasUserProfile {
   user_id?: string | number
   id?: string | number
+  canvas_user_id?: string | number
   name?: string
   email?: string
+  sis_user_id?: string
   sis_id?: string
   canvas_account_name?: string
   status?: string
@@ -111,6 +115,12 @@ function asNumber(value: unknown): number | undefined {
   return undefined
 }
 
+function asId(value: unknown): string | number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string' && value.trim()) return value.trim()
+  return undefined
+}
+
 function firstString(...values: unknown[]): string | undefined {
   for (const value of values) {
     const text = asString(value)
@@ -125,6 +135,38 @@ function normalizedTimezone(...values: unknown[]): string | undefined {
   if (!timezone || timezone.toLowerCase() === 'canvas') return undefined
 
   return timezone
+}
+
+function firstSisUserIdFromArray(values: unknown[]): string | undefined {
+  for (const value of values) {
+    const record = asRecord(value)
+    const user = asRecord(record.user)
+    const loginInformation = asFirstRecord(
+      record.login_information ??
+      record.loginInformation ??
+      record.login_info ??
+      record.loginInfo ??
+      record.pseudonym ??
+      record.pseudonyms
+    )
+
+    const sisUserId = firstString(
+      record.sis_user_id,
+      record.sis_id,
+      record.sisId,
+      record.sisID,
+      user.sis_user_id,
+      user.sis_id,
+      loginInformation.sis_user_id,
+      loginInformation.sis_id,
+      loginInformation.sisId,
+      loginInformation.sisID
+    )
+
+    if (sisUserId) return sisUserId
+  }
+
+  return undefined
 }
 
 function isMissingToolError(error: unknown): boolean {
@@ -166,6 +208,7 @@ function normalizeProfile(raw: unknown, email: string): CanvasUserProfile | null
   )
   const rootAccount = asRecord(root.account ?? root.canvas_account)
   const profileAccount = asRecord(profile.account ?? profile.canvas_account)
+  const profileUser = asRecord(profile.user)
   const rootUser = asRecord(root.user)
   const loginInformation = asFirstRecord(
     profile.login_information ??
@@ -183,31 +226,43 @@ function normalizeProfile(raw: unknown, email: string): CanvasUserProfile | null
   )
   const profileSettings = asRecord(profile.settings ?? profile.preferences)
   const rootSettings = asRecord(root.settings ?? root.preferences)
+  const sisUserId = firstString(
+    profile.sis_user_id,
+    profile.sis_id,
+    profile.sisId,
+    profile.sisID,
+    profile.student_number,
+    profile.studentNumber,
+    profile.student_id,
+    profile.studentId,
+    profileUser.sis_user_id,
+    profileUser.sis_id,
+    root.sis_user_id,
+    root.sis_id,
+    root.student_number,
+    root.student_id,
+    rootUser.sis_user_id,
+    rootUser.sis_id,
+    loginInformation.sis_user_id,
+    loginInformation.sis_id,
+    loginInformation.sisId,
+    loginInformation.sisID,
+    firstSisUserIdFromArray(enrolments)
+  )
 
   if (Object.keys(profile).length === 0) return null
 
   return {
-    user_id: profile.user_id as string | number | undefined,
-    id: profile.id as string | number | undefined,
+    user_id: asId(profile.user_id) ?? asId(root.user_id),
+    id: asId(profile.id) ?? asId(profileUser.id),
+    canvas_user_id:
+      asId(profile.canvas_user_id) ??
+      asId(profile.canvasUserId) ??
+      asId(root.canvas_user_id),
     name: asString(profile.name),
-    email: asString(profile.email) ?? email,
-    sis_id:
-      firstString(
-        profile.sis_user_id,
-        profile.sis_id,
-        profile.sisId,
-        profile.sisID,
-        profile.student_id,
-        profile.studentId,
-        root.sis_user_id,
-        root.sis_id,
-        rootUser.sis_user_id,
-        rootUser.sis_id,
-        loginInformation.sis_user_id,
-        loginInformation.sis_id,
-        loginInformation.sisId,
-        loginInformation.sisID
-      ),
+    email: asString(profile.email) ?? asString(profileUser.email) ?? asString(root.email) ?? email,
+    sis_user_id: sisUserId,
+    sis_id: sisUserId,
     canvas_account_name:
       asString(profile.canvas_account_name) ??
       asString(profile.canvasAccountName) ??
@@ -281,8 +336,45 @@ function normalizeAnnouncements(raw: unknown): CanvasAnnouncementSummary[] {
 }
 
 export function canvasUserId(profile: CanvasUserProfile): string | undefined {
-  const id = profile.user_id ?? profile.id
+  const id = profile.canvas_user_id ?? profile.user_id ?? profile.id
   return id === undefined || id === null ? undefined : String(id)
+}
+
+function mergeProfiles(
+  primary: CanvasUserProfile,
+  supplemental: CanvasUserProfile
+): CanvasUserProfile {
+  const sisUserId = primary.sis_user_id ?? primary.sis_id ?? supplemental.sis_user_id ?? supplemental.sis_id
+
+  return {
+    ...primary,
+    user_id: primary.user_id ?? supplemental.user_id,
+    id: primary.id ?? supplemental.id,
+    canvas_user_id: primary.canvas_user_id ?? supplemental.canvas_user_id,
+    name: primary.name ?? supplemental.name,
+    email: primary.email ?? supplemental.email,
+    sis_user_id: sisUserId,
+    sis_id: sisUserId,
+    canvas_account_name: primary.canvas_account_name ?? supplemental.canvas_account_name,
+    status: primary.status ?? supplemental.status,
+    timezone: primary.timezone ?? supplemental.timezone,
+    active_course_count: primary.active_course_count ?? supplemental.active_course_count,
+    total_enrollments: primary.total_enrollments ?? supplemental.total_enrollments,
+    enrolments: primary.enrolments.length > 0 ? primary.enrolments : supplemental.enrolments,
+    completed_modules:
+      primary.completed_modules.length > 0 ? primary.completed_modules : supplemental.completed_modules,
+  }
+}
+
+async function tryFindCanvasUserByEmail(email: string): Promise<CanvasUserProfile | null | undefined> {
+  try {
+    const raw = await callCanvasMcpTool('get_user_by_email', { email })
+    return normalizeProfile(raw, email)
+  } catch (error) {
+    // SIS enrichment should never block a profile that was already found.
+    if (isMissingToolError(error)) return undefined
+    return undefined
+  }
 }
 
 export async function findCanvasUserByEmail(email: string): Promise<CanvasUserProfile | null> {
@@ -291,7 +383,13 @@ export async function findCanvasUserByEmail(email: string): Promise<CanvasUserPr
     { name: 'get_user_by_email', args: { email } },
   ])
 
-  return normalizeProfile(raw, email)
+  const profile = normalizeProfile(raw, email)
+  if (!profile || profile.sis_user_id) return profile
+
+  const userByEmailProfile = await tryFindCanvasUserByEmail(email)
+  if (!userByEmailProfile) return profile
+
+  return mergeProfiles(profile, userByEmailProfile)
 }
 
 export async function getCanvasCourses(profile: CanvasUserProfile): Promise<CanvasCourseSummary[]> {
