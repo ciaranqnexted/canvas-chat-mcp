@@ -26,8 +26,8 @@ export default function ChatInput({ onSend, disabled, placeholder }: Props) {
   }
 
   return (
-    <div className="border-t bg-white px-4 py-3">
-      <div className="flex items-end gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400">
+    <div className="border-t border-gray-200 bg-white px-3 py-3 sm:px-4">
+      <div className="flex items-end gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400">
         <textarea
           value={value}
           onChange={e => setValue(e.target.value)}
@@ -35,13 +35,13 @@ export default function ChatInput({ onSend, disabled, placeholder }: Props) {
           disabled={disabled}
           placeholder={placeholder ?? 'Ask about your course documents or Canvas...'}
           rows={1}
-          className="flex-1 resize-none bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none disabled:opacity-50"
+          className="max-h-28 min-h-8 flex-1 resize-none bg-transparent py-1 text-sm leading-6 text-gray-800 placeholder-gray-400 focus:outline-none disabled:opacity-50"
           aria-label="Chat message"
         />
         <button
           onClick={handleSend}
           disabled={disabled || !value.trim()}
-          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white transition hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-blue-600 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Send message"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -49,7 +49,7 @@ export default function ChatInput({ onSend, disabled, placeholder }: Props) {
           </svg>
         </button>
       </div>
-      <p className="mt-1 text-center text-xs text-gray-400">
+      <p className="mt-2 text-center text-[11px] leading-4 text-gray-400">
         Prototype mode uses Canvas MCP lookup plus a simulated OTP before showing student data.
       </p>
     </div>

@@ -46,21 +46,21 @@ export default function ChatWindow() {
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="border-b bg-white px-4 py-3">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
-          <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1 text-sm">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="border-b border-gray-200 bg-white px-3 py-3 sm:px-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1 text-xs sm:text-sm">
             <button
               type="button"
               onClick={() => setMode('local')}
-              className={`rounded-md px-3 py-1.5 ${mode === 'local' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
+              className={`rounded-md px-2.5 py-1.5 transition sm:px-3 ${mode === 'local' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Local documents
             </button>
             <button
               type="button"
               onClick={() => setMode('canvas')}
-              className={`rounded-md px-3 py-1.5 ${mode === 'canvas' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
+              className={`rounded-md px-2.5 py-1.5 transition sm:px-3 ${mode === 'canvas' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Canvas
             </button>
@@ -85,11 +85,11 @@ export default function ChatWindow() {
       </div>
 
       {/* Message list */}
-      <div className="mx-auto w-full max-w-3xl flex-1 space-y-4 overflow-y-auto px-4 py-6">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-gray-50 px-3 py-4 sm:px-5 sm:py-6">
         {session.messages.length === 0 && (
-          <div className="text-center text-gray-400 mt-12">
-            <p className="text-lg font-medium">Hi, I&apos;m Nexi.</p>
-            <p className="text-sm mt-1">
+          <div className="mx-auto mt-10 max-w-sm rounded-lg border border-gray-200 bg-white px-5 py-5 text-center shadow-sm sm:mt-14">
+            <p className="text-base font-semibold text-gray-900">Hi, I&apos;m Nexi.</p>
+            <p className="mt-2 text-sm leading-6 text-gray-500">
               Enter your Canvas email, verify the prototype OTP, then choose what you want to check.
             </p>
           </div>
@@ -98,7 +98,7 @@ export default function ChatWindow() {
           <MessageBubble key={message.id} message={message} onAction={handleAction} />
         ))}
         {session.isLoading && (
-          <div className="flex items-center gap-2 text-gray-400 text-sm">
+          <div className="flex items-center gap-2 px-1 text-sm text-gray-400">
             <div className="h-2 w-2 rounded-full bg-gray-300 animate-bounce [animation-delay:-0.3s]" />
             <div className="h-2 w-2 rounded-full bg-gray-300 animate-bounce [animation-delay:-0.15s]" />
             <div className="h-2 w-2 rounded-full bg-gray-300 animate-bounce" />

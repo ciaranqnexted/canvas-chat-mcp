@@ -11,10 +11,10 @@ export default function MessageBubble({ message, onAction }: Props) {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[75%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+        className={`max-w-[88%] whitespace-pre-wrap rounded-lg px-4 py-3 text-sm leading-relaxed sm:max-w-[78%] ${
           isUser
-            ? 'bg-blue-600 text-white rounded-br-sm'
-            : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-sm'
+            ? 'bg-blue-600 text-white'
+            : 'border border-gray-200 bg-white text-gray-800 shadow-sm'
         }`}
       >
         {message.content}
@@ -39,7 +39,7 @@ export default function MessageBubble({ message, onAction }: Props) {
                 }}
                 disabled={action.disabled}
                 title={action.reason}
-                className={`rounded-md border px-3 py-1.5 text-left text-xs font-medium ${
+                className={`rounded-md border px-3 py-1.5 text-left text-xs font-medium transition ${
                   action.disabled
                     ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
                     : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
