@@ -38,8 +38,8 @@ export interface CanvasUserProfile {
   id?: string | number
   name?: string
   email?: string
+  sis_id?: string
   canvas_account_name?: string
-  pronouns?: string
   status?: string
   timezone?: string
   active_course_count?: number

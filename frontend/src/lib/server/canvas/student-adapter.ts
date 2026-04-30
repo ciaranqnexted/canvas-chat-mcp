@@ -48,8 +48,8 @@ export interface CanvasUserProfile {
   id?: string | number
   name?: string
   email?: string
+  sis_id?: string
   canvas_account_name?: string
-  pronouns?: string
   status?: string
   timezone?: string
   active_course_count?: number
@@ -88,6 +88,11 @@ function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' ? value as Record<string, unknown> : {}
 }
 
+function asFirstRecord(value: unknown): Record<string, unknown> {
+  if (Array.isArray(value)) return asRecord(value[0])
+  return asRecord(value)
+}
+
 function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? value as T[] : []
 }
@@ -104,6 +109,22 @@ function asNumber(value: unknown): number | undefined {
   }
 
   return undefined
+}
+
+function firstString(...values: unknown[]): string | undefined {
+  for (const value of values) {
+    const text = asString(value)
+    if (text) return text
+  }
+
+  return undefined
+}
+
+function normalizedTimezone(...values: unknown[]): string | undefined {
+  const timezone = firstString(...values)
+  if (!timezone || timezone.toLowerCase() === 'canvas') return undefined
+
+  return timezone
 }
 
 function isMissingToolError(error: unknown): boolean {
@@ -145,6 +166,23 @@ function normalizeProfile(raw: unknown, email: string): CanvasUserProfile | null
   )
   const rootAccount = asRecord(root.account ?? root.canvas_account)
   const profileAccount = asRecord(profile.account ?? profile.canvas_account)
+  const rootUser = asRecord(root.user)
+  const loginInformation = asFirstRecord(
+    profile.login_information ??
+    profile.loginInformation ??
+    profile.login_info ??
+    profile.loginInfo ??
+    profile.pseudonym ??
+    profile.pseudonyms ??
+    root.login_information ??
+    root.loginInformation ??
+    root.login_info ??
+    root.loginInfo ??
+    root.pseudonym ??
+    root.pseudonyms
+  )
+  const profileSettings = asRecord(profile.settings ?? profile.preferences)
+  const rootSettings = asRecord(root.settings ?? root.preferences)
 
   if (Object.keys(profile).length === 0) return null
 
@@ -153,6 +191,23 @@ function normalizeProfile(raw: unknown, email: string): CanvasUserProfile | null
     id: profile.id as string | number | undefined,
     name: asString(profile.name),
     email: asString(profile.email) ?? email,
+    sis_id:
+      firstString(
+        profile.sis_user_id,
+        profile.sis_id,
+        profile.sisId,
+        profile.sisID,
+        profile.student_id,
+        profile.studentId,
+        root.sis_user_id,
+        root.sis_id,
+        rootUser.sis_user_id,
+        rootUser.sis_id,
+        loginInformation.sis_user_id,
+        loginInformation.sis_id,
+        loginInformation.sisId,
+        loginInformation.sisID
+      ),
     canvas_account_name:
       asString(profile.canvas_account_name) ??
       asString(profile.canvasAccountName) ??
@@ -162,18 +217,24 @@ function normalizeProfile(raw: unknown, email: string): CanvasUserProfile | null
       asString(root.account_name) ??
       asString(profileAccount.name) ??
       asString(rootAccount.name),
-    pronouns:
-      asString(profile.pronouns) ??
-      asString(profile.personal_pronouns) ??
-      asString(profile.user_pronouns) ??
-      asString(root.pronouns),
     status: asString(profile.status),
-    timezone:
-      asString(profile.timezone) ??
-      asString(profile.time_zone) ??
-      asString(profile.timeZone) ??
-      asString(root.timezone) ??
-      asString(root.time_zone),
+    timezone: normalizedTimezone(
+      profile.time_zone,
+      profile.timezone,
+      profile.timeZone,
+      profile.effective_time_zone,
+      profile.effectiveTimezone,
+      rootUser.time_zone,
+      rootUser.timezone,
+      root.time_zone,
+      root.timezone,
+      profileSettings.time_zone,
+      profileSettings.timezone,
+      rootSettings.time_zone,
+      rootSettings.timezone,
+      loginInformation.time_zone,
+      loginInformation.timezone
+    ),
     active_course_count:
       asNumber(profile.active_course_count) ??
       asNumber(profile.activeCourseCount) ??
