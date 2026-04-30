@@ -1,0 +1,17 @@
+{
+  "name": "canvas-chat-mcp",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend run start",
+    "lint": "npm --prefix frontend run lint",
+    "typecheck": "npm --prefix frontend run typecheck"
+  },
+  "dependencies": {
+    "next": "^15.5.15",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  }
+}
