@@ -58,6 +58,40 @@ function courseName(course: CanvasCourseSummary): string {
   return course.course_name || course.name || 'Untitled course'
 }
 
+function isActiveCourse(course: CanvasCourseSummary): boolean {
+  const status = (course.status ?? course.workflow_state ?? '').toLowerCase()
+  if (!status) return false
+
+  return ['active', 'available', 'current', 'enrolled'].some(value => status.includes(value))
+}
+
+function activeCourseCount(profile: CanvasUserProfile): number {
+  if (typeof profile.active_course_count === 'number') return profile.active_course_count
+
+  const activeCount = profile.enrolments.filter(isActiveCourse).length
+  return activeCount > 0 ? activeCount : profile.enrolments.length
+}
+
+function totalEnrollmentCount(profile: CanvasUserProfile): number {
+  return typeof profile.total_enrollments === 'number'
+    ? profile.total_enrollments
+    : profile.enrolments.length
+}
+
+function formatProfileWelcome(profile: CanvasUserProfile): string {
+  const name = profile.name || 'there'
+  const accountName = profile.canvas_account_name || 'Canvas'
+  const pronouns = profile.pronouns || 'your chosen pronouns'
+  const timezone = profile.timezone || 'Canvas timezone'
+
+  return [
+    `Welcome ${name}, to the ${accountName} chatbot.`,
+    `We will address you as ${pronouns} and send you messages in your ${timezone}.`,
+    `You have ${activeCourseCount(profile)} active courses and a total of ${totalEnrollmentCount(profile)} enrollments.`,
+    'Wishing you well in your learning journey with NextEd.',
+  ].join('\n')
+}
+
 export function profileActions(profile: CanvasUserProfile): CanvasProfileAction[] {
   const hasCourses = profile.enrolments.length > 0
   const noCoursesReason = 'No active course enrolments were returned.'
@@ -136,30 +170,15 @@ export function formatOtpPrompt(profile: CanvasUserProfile): string {
 }
 
 export function formatStudentDashboard(profile: CanvasUserProfile): string {
-  const name = profile.name || 'there'
-
   return [
-    `You are verified as ${name}.`,
-    '',
-    `Courses found: ${profile.enrolments.length}`,
-    `Completed modules/results found: ${profile.completed_modules.length}`,
+    formatProfileWelcome(profile),
     '',
     'Choose an option below or ask for courses, enrolments, grades, deadlines, announcements, or support.',
   ].join('\n')
 }
 
 export function formatProfile(profile: CanvasUserProfile): string {
-  const lines = [
-    'I found this Canvas profile:',
-    '',
-    `Name: ${profile.name || 'Not supplied'}`,
-    `Email: ${profile.email || 'Not supplied'}`,
-    `Status: ${profile.status || 'Unknown'}`,
-    `Current enrolments: ${profile.enrolments.length}`,
-    `Completed modules: ${profile.completed_modules.length}`,
-  ]
-
-  return lines.join('\n')
+  return formatProfileWelcome(profile)
 }
 
 export function formatCourses(courses: CanvasCourseSummary[]): string {

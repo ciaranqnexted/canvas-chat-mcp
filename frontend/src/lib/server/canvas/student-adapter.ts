@@ -48,7 +48,12 @@ export interface CanvasUserProfile {
   id?: string | number
   name?: string
   email?: string
+  canvas_account_name?: string
+  pronouns?: string
   status?: string
+  timezone?: string
+  active_course_count?: number
+  total_enrollments?: number
   enrolments: CanvasCourseSummary[]
   completed_modules: CanvasCompletedModule[]
 }
@@ -85,6 +90,20 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? value as T[] : []
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined
+}
+
+function asNumber(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) return parsed
+  }
+
+  return undefined
 }
 
 function isMissingToolError(error: unknown): boolean {
@@ -124,15 +143,49 @@ function normalizeProfile(raw: unknown, email: string): CanvasUserProfile | null
   const completedModules = asArray<CanvasCompletedModule>(
     profile.completed_modules ?? profile.completedModules ?? profile.modules ?? profile.results
   )
+  const rootAccount = asRecord(root.account ?? root.canvas_account)
+  const profileAccount = asRecord(profile.account ?? profile.canvas_account)
 
   if (Object.keys(profile).length === 0) return null
 
   return {
     user_id: profile.user_id as string | number | undefined,
     id: profile.id as string | number | undefined,
-    name: profile.name as string | undefined,
-    email: (profile.email as string | undefined) ?? email,
-    status: profile.status as string | undefined,
+    name: asString(profile.name),
+    email: asString(profile.email) ?? email,
+    canvas_account_name:
+      asString(profile.canvas_account_name) ??
+      asString(profile.canvasAccountName) ??
+      asString(profile.account_name) ??
+      asString(profile.accountName) ??
+      asString(root.canvas_account_name) ??
+      asString(root.account_name) ??
+      asString(profileAccount.name) ??
+      asString(rootAccount.name),
+    pronouns:
+      asString(profile.pronouns) ??
+      asString(profile.personal_pronouns) ??
+      asString(profile.user_pronouns) ??
+      asString(root.pronouns),
+    status: asString(profile.status),
+    timezone:
+      asString(profile.timezone) ??
+      asString(profile.time_zone) ??
+      asString(profile.timeZone) ??
+      asString(root.timezone) ??
+      asString(root.time_zone),
+    active_course_count:
+      asNumber(profile.active_course_count) ??
+      asNumber(profile.activeCourseCount) ??
+      asNumber(profile.no_of_courses) ??
+      asNumber(profile.noOfCourses) ??
+      asNumber(root.active_course_count),
+    total_enrollments:
+      asNumber(profile.total_enrollments) ??
+      asNumber(profile.totalEnrollments) ??
+      asNumber(profile.enrollment_count) ??
+      asNumber(profile.enrolment_count) ??
+      asNumber(root.total_enrollments),
     enrolments,
     completed_modules: completedModules,
   }
@@ -239,4 +292,3 @@ export async function getCanvasAnnouncements(
 
   return normalizeAnnouncements(raw)
 }
-
