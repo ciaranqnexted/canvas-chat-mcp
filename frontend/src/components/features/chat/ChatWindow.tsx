@@ -41,6 +41,7 @@ export default function ChatWindow() {
   }
 
   const handleAction = (action: ChatAction) => {
+    if (action.disabled) return
     send(action.label, action.id)
   }
 
@@ -67,7 +68,7 @@ export default function ChatWindow() {
           <div className="flex items-center gap-2 text-xs">
             <span className="hidden text-gray-500 sm:inline">
               {mode === 'canvas'
-                ? 'Canvas email lookup'
+                ? 'Canvas MCP with student verification'
                 : 'Using local folder'}
             </span>
             {canvasAuth.authenticated && (
@@ -87,9 +88,9 @@ export default function ChatWindow() {
       <div className="mx-auto w-full max-w-3xl flex-1 space-y-4 overflow-y-auto px-4 py-6">
         {session.messages.length === 0 && (
           <div className="text-center text-gray-400 mt-12">
-            <p className="text-lg font-medium">Hi, I&apos;m Eddie.</p>
+            <p className="text-lg font-medium">Hi, I&apos;m Nexi.</p>
             <p className="text-sm mt-1">
-              Enter the email address you use for Canvas and I&apos;ll look up your profile.
+              Enter your Canvas email, verify the prototype OTP, then choose what you want to check.
             </p>
           </div>
         )}
@@ -112,7 +113,7 @@ export default function ChatWindow() {
         disabled={session.isLoading}
         placeholder={
           mode === 'canvas'
-            ? 'Enter your Canvas email address...'
+            ? 'Enter your Canvas email or one-time code...'
             : 'Ask about files in the local documents folder...'
         }
       />

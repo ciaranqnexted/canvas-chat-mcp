@@ -27,41 +27,43 @@ Created GitHub issues:
 
 GitHub issue: [#1](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/1)
 
-Status: planned
+Status: implemented in first v0.2 branch pass
 
 Tasks:
 
-- [ ] Add `NEXI_OTP`, `NEXI_OTP_EMAIL`, and `NEXI_DEV_OTP` env docs and runtime parsing.
-- [ ] Add production guard for `NEXI_OTP=false`.
-- [ ] Add server-side `StudentSession` store keyed by `session_id`.
-- [ ] Add state transitions: email requested, profile found, OTP requested, verified.
-- [ ] Reject invalid email before MCP lookup.
-- [ ] Block unknown Canvas email.
-- [ ] Accept dev OTP `45454545` when prototype OTP mode is active.
-- [ ] Reject incorrect OTP without marking session verified.
+- [x] Add `NEXI_OTP`, `NEXI_OTP_EMAIL`, and `NEXI_DEV_OTP` env docs and runtime parsing.
+- [x] Add production guard for `NEXI_OTP=false`.
+- [x] Add server-side `StudentSession` store keyed by `session_id`.
+- [x] Add state transitions: email requested, profile found, OTP requested, verified.
+- [x] Reject invalid email before MCP lookup.
+- [x] Block unknown Canvas email.
+- [x] Accept dev OTP `45454545` when prototype OTP mode is active.
+- [x] Reject incorrect OTP without marking session verified.
 
 Acceptance tests:
 
-- [ ] Invalid email rejected.
-- [ ] Non-existent email blocked.
-- [ ] Correct OTP verifies session.
-- [ ] Incorrect OTP does not verify session.
-- [ ] Prototype OTP mode cannot run in production.
+- [x] Invalid email rejected.
+- [x] Non-existent email blocked.
+- [x] Correct OTP verifies session.
+- [x] Incorrect OTP does not verify session.
+- [x] Prototype OTP mode cannot run in production.
+
+Note: automated regression coverage remains tracked in issue #6. The live correct-OTP smoke path requires a known Canvas test student email.
 
 ### 2. Personalised dashboard and dynamic buttons
 
 GitHub issue: [#4](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/4)
 
-Status: planned
+Status: partially implemented in first v0.2 branch pass
 
 Tasks:
 
-- [ ] Define dashboard action model.
-- [ ] Render post-verification profile summary.
-- [ ] Add top-level buttons: Profile, Courses, Enrolments, Assignments, Grades, Announcements, Deadlines, Support.
-- [ ] Add disabled states with reasons.
+- [x] Define dashboard action model.
+- [x] Render post-verification profile summary.
+- [x] Add top-level buttons: Profile, Courses, Enrolments, Assignments, Grades, Announcements, Deadlines, Support.
+- [x] Add disabled states with reasons.
 - [ ] Preserve selected course in session state.
-- [ ] Keep buttons compact and usable on mobile.
+- [x] Keep buttons compact and usable on mobile.
 
 Acceptance tests:
 
@@ -73,22 +75,22 @@ Acceptance tests:
 
 GitHub issue: [#3](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/3)
 
-Status: planned
+Status: implemented for profile, courses, enrolments, and grades/results
 
 Tasks:
 
-- [ ] Create server-only MCP adapter module.
-- [ ] Map current tools: `get_user_profile`, `list_user_courses`, `get_user_exam_results`.
-- [ ] Map spec tools when available: `get_user_by_email`, `get_profile`, `get_courses`, `get_assignments`, `get_grades`.
-- [ ] Normalize profile, course, assignment, grade, announcement, and support results.
-- [ ] Add clear fallback when a required tool is unavailable.
-- [ ] Prevent write/admin tools from being used by the student path.
+- [x] Create server-only MCP adapter module.
+- [x] Map current tools: `get_user_profile`, `list_user_courses`, `get_user_exam_results`.
+- [x] Map spec tools when available: `get_user_by_email`, `get_courses`, `get_assignments`, `get_grades`.
+- [x] Normalize profile, course, assignment, grade/result, and announcement result shapes.
+- [x] Add clear fallback when a required tool is unavailable.
+- [x] Prevent write/admin tools from being used by the student path.
 
 Acceptance tests:
 
-- [ ] Adapter uses the available deployed tool for profile lookup.
-- [ ] Missing required tool gives a user-safe fallback.
-- [ ] Unexpected write-capable tool is not surfaced.
+- [x] Adapter uses the available deployed tool for profile lookup.
+- [x] Missing required tool gives a user-safe fallback.
+- [x] Unexpected write-capable tool is not surfaced.
 
 ### 4. Academic data flows: assignments, grades, announcements, deadlines
 

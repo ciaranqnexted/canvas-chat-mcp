@@ -53,11 +53,11 @@ If this is missing or mismatched, Canvas will reject the login flow.
 | `CANVAS_MCP_BEARER_TOKEN` | MCP deployment secret, if any | Optional MCP protection | Sent as `Authorization: Bearer ...` |
 | `CANVAS_MCP_COMMAND` | Local MCP install/deployment | Future local MCP client | Default: `canvas-mcp-server` |
 
-Canvas MCP email lookup is wired for development/demo. It calls:
+Canvas MCP access is wired through the server-only student adapter. The current deployed tool mapping is:
 
-- `get_user_profile({ email })`
-- `list_user_courses({ user_id })` when the user clicks **See your courses**
-- `get_user_exam_results({ user_id })` when the user clicks **View exam results**
+- `get_user_profile({ email })` with fallback support for future `get_user_by_email`
+- `list_user_courses({ user_id })` with fallback support for future `get_courses`
+- `get_user_exam_results({ user_id })` with fallback support for future `get_grades`
 
 If `list_user_courses` or `get_user_exam_results` are unavailable, the app falls back to course/module data returned by `get_user_profile`.
 
@@ -77,6 +77,22 @@ when any required OAuth/session variable is missing:
 - `CANVAS_CLIENT_SECRET`
 
 Set them in `frontend/.env.local`, restart `npm run dev`, and click **Sign in with Canvas** again.
+
+## Required For Nexi Prototype Verification
+
+| Variable | Where to get it | Used by | Notes |
+|---|---|---|---|
+| `NEXI_OTP` | Repo default | Student verification | Set `false` for the simulated v0.2 OTP prototype. Real OTP delivery is future work. |
+| `NEXI_OTP_EMAIL` | Your dev inbox | Prototype OTP note | Documents where real OTP would be delivered later; no email is sent in v0.2. |
+| `NEXI_DEV_OTP` | Repo default | Simulated OTP check | Default prototype code is `45454545`; keep production off prototype mode. |
+
+Production rule:
+
+```ts
+if (process.env.NODE_ENV === 'production' && process.env.NEXI_OTP === 'false') {
+  throw new Error('Prototype OTP mode must not be enabled in production')
+}
+```
 
 ## Why Canvas Email Lookup Cannot Reach MCP
 

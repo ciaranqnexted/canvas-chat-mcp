@@ -1,144 +1,115 @@
-import { callCanvasMcpTool } from './mcp-http-client'
+import {
+  canvasStudentCapabilities,
+  canvasUserId,
+  findCanvasUserByEmail,
+  getCanvasCourses,
+  getCanvasExamResults,
+  type CanvasCompletedModule,
+  type CanvasCourseSummary,
+  type CanvasUserProfile,
+} from './student-adapter'
 
-export type CanvasProfileActionId = 'see_courses' | 'view_exam_results'
-
-export interface CanvasCourseSummary {
-  course_id?: string | number
-  course_name?: string
-  name?: string
-  status?: string
-}
-
-export interface CanvasCompletedModule {
-  module_id?: string | number
-  module_name?: string
-  name?: string
-  course_id?: string | number
-  course_name?: string
-  completed_at?: string | null
-  exam_result_available?: boolean
-  result?: string | number
-  score?: string | number
-  grade?: string | number
-}
-
-export interface CanvasUserProfile {
-  user_id?: string | number
-  id?: string | number
-  name?: string
-  email?: string
-  status?: string
-  enrolments: CanvasCourseSummary[]
-  completed_modules: CanvasCompletedModule[]
-}
+export type CanvasProfileActionId =
+  | 'view_profile'
+  | 'see_courses'
+  | 'see_enrolments'
+  | 'view_assignments'
+  | 'view_deadlines'
+  | 'view_grades'
+  | 'view_exam_results'
+  | 'view_announcements'
+  | 'get_support'
 
 export interface CanvasProfileAction {
   id: CanvasProfileActionId
   label: string
+  disabled?: boolean
+  reason?: string
 }
-
-const sessionProfiles = new Map<string, CanvasUserProfile>()
 
 export function isLikelyEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
 }
 
-function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' ? value as Record<string, unknown> : {}
+function disabledAction(
+  id: CanvasProfileActionId,
+  label: string,
+  reason: string
+): CanvasProfileAction {
+  return { id, label, disabled: true, reason }
 }
 
-function asArray<T>(value: unknown): T[] {
-  return Array.isArray(value) ? value as T[] : []
-}
-
-function normalizeProfile(raw: unknown, email: string): CanvasUserProfile | null {
-  const root = asRecord(raw)
-
-  if (root.not_found === true || root.found === false || root.status === 'not_found') {
-    return null
-  }
-
-  const profile = asRecord(root.profile ?? root.user ?? root)
-  const enrolments = asArray<CanvasCourseSummary>(
-    profile.enrolments ?? profile.enrollments ?? profile.courses
-  )
-  const completedModules = asArray<CanvasCompletedModule>(
-    profile.completed_modules ?? profile.completedModules ?? profile.modules
-  )
-
-  return {
-    user_id: profile.user_id as string | number | undefined,
-    id: profile.id as string | number | undefined,
-    name: profile.name as string | undefined,
-    email: (profile.email as string | undefined) ?? email,
-    status: profile.status as string | undefined,
-    enrolments,
-    completed_modules: completedModules,
-  }
+function hasCanvasUser(profile: CanvasUserProfile): boolean {
+  return Boolean(canvasUserId(profile))
 }
 
 export function profileActions(profile: CanvasUserProfile): CanvasProfileAction[] {
-  const actions: CanvasProfileAction[] = []
+  const hasCourses = profile.enrolments.length > 0
+  const noCoursesReason = 'No active course enrolments were returned.'
+  const noUserReason = 'Canvas did not return a student user id.'
 
-  if (profile.enrolments.length > 0) {
-    actions.push({ id: 'see_courses', label: 'See your courses' })
-  }
-
-  if (profile.completed_modules.length > 0) {
-    actions.push({ id: 'view_exam_results', label: 'View exam results' })
-  }
-
-  return actions
+  return [
+    { id: 'view_profile', label: 'Profile' },
+    hasCourses
+      ? { id: 'see_courses', label: 'Courses' }
+      : disabledAction('see_courses', 'Courses', noCoursesReason),
+    hasCourses
+      ? { id: 'see_enrolments', label: 'Enrolments' }
+      : disabledAction('see_enrolments', 'Enrolments', noCoursesReason),
+    canvasStudentCapabilities.grades && hasCanvasUser(profile)
+      ? { id: 'view_grades', label: 'Grades and results' }
+      : disabledAction('view_grades', 'Grades and results', noUserReason),
+    canvasStudentCapabilities.assignments
+      ? { id: 'view_assignments', label: 'Assignments' }
+      : disabledAction('view_assignments', 'Assignments', 'Student-scoped assignments are not exposed by the MCP yet.'),
+    canvasStudentCapabilities.deadlines
+      ? { id: 'view_deadlines', label: 'Deadlines' }
+      : disabledAction('view_deadlines', 'Deadlines', 'Deadline data needs a student-scoped assignment tool.'),
+    canvasStudentCapabilities.announcements
+      ? { id: 'view_announcements', label: 'Announcements' }
+      : disabledAction('view_announcements', 'Announcements', 'Announcement lookup is not connected yet.'),
+    { id: 'get_support', label: 'Support' },
+  ]
 }
 
-export function saveProfile(sessionId: string, profile: CanvasUserProfile): void {
-  sessionProfiles.set(sessionId, profile)
+export async function lookupProfileByEmail(email: string): Promise<CanvasUserProfile | null> {
+  return findCanvasUserByEmail(email)
 }
 
-export function getSavedProfile(sessionId: string): CanvasUserProfile | undefined {
-  return sessionProfiles.get(sessionId)
+export async function getCoursesForProfile(
+  profile: CanvasUserProfile
+): Promise<CanvasCourseSummary[]> {
+  return getCanvasCourses(profile)
 }
 
-function userId(profile: CanvasUserProfile): string | number | undefined {
-  return profile.user_id ?? profile.id
+export async function getExamResultsForProfile(
+  profile: CanvasUserProfile
+): Promise<CanvasCompletedModule[]> {
+  return getCanvasExamResults(profile)
 }
 
-export async function lookupProfileByEmail(
-  sessionId: string,
-  email: string
-): Promise<CanvasUserProfile | null> {
-  const raw = await callCanvasMcpTool('get_user_profile', { email })
-  const profile = normalizeProfile(raw, email)
+export function formatOtpPrompt(profile: CanvasUserProfile): string {
+  const name = profile.name ? ` for ${profile.name}` : ''
 
-  if (profile) saveProfile(sessionId, profile)
-
-  return profile
+  return [
+    `I found the Canvas profile${name}.`,
+    '',
+    'Enter the one-time code to verify this student session.',
+    'Prototype note: no email is sent in this build; use the development OTP configured in `NEXI_DEV_OTP`.',
+  ].join('\n')
 }
 
-export async function getCoursesForProfile(profile: CanvasUserProfile): Promise<CanvasCourseSummary[]> {
-  const id = userId(profile)
-  if (!id) return profile.enrolments
+export function formatStudentDashboard(profile: CanvasUserProfile): string {
+  const name = profile.name || 'there'
 
-  try {
-    const raw = await callCanvasMcpTool('list_user_courses', { user_id: id })
-    const record = asRecord(raw)
-    return asArray<CanvasCourseSummary>(record.courses ?? record.enrolments ?? record.enrollments ?? raw)
-  } catch {
-    return profile.enrolments
-  }
-}
-
-export async function getExamResultsForProfile(profile: CanvasUserProfile): Promise<CanvasCompletedModule[]> {
-  const id = userId(profile)
-  if (!id) return profile.completed_modules
-
-  try {
-    const raw = await callCanvasMcpTool('get_user_exam_results', { user_id: id })
-    const record = asRecord(raw)
-    return asArray<CanvasCompletedModule>(record.results ?? record.exam_results ?? record.modules ?? raw)
-  } catch {
-    return profile.completed_modules
-  }
+  return [
+    `You are verified as ${name}.`,
+    '',
+    `Courses found: ${profile.enrolments.length}`,
+    `Completed modules/results found: ${profile.completed_modules.length}`,
+    '',
+    'Choose an option below or ask for courses, enrolments, grades, deadlines, announcements, or support.',
+  ].join('\n')
 }
 
 export function formatProfile(profile: CanvasUserProfile): string {
@@ -151,11 +122,6 @@ export function formatProfile(profile: CanvasUserProfile): string {
     `Current enrolments: ${profile.enrolments.length}`,
     `Completed modules: ${profile.completed_modules.length}`,
   ]
-
-  const actions = profileActions(profile)
-  if (actions.length > 0) {
-    lines.push('', 'Choose one of the options below.')
-  }
 
   return lines.join('\n')
 }
@@ -178,7 +144,7 @@ export function formatExamResults(results: CanvasCompletedModule[]): string {
   if (results.length === 0) return 'I could not find completed modules or exam results for this profile.'
 
   return [
-    'Here are the completed modules and available exam result details I found:',
+    'Here are the grades and exam result details I found:',
     '',
     ...results.map((module, index) => {
       const name = module.module_name || module.name || 'Untitled module'
@@ -187,5 +153,35 @@ export function formatExamResults(results: CanvasCompletedModule[]): string {
       const completedAt = module.completed_at ? `, completed ${module.completed_at}` : ''
       return `${index + 1}. ${name} - ${resultText}${completedAt}`
     }),
+  ].join('\n')
+}
+
+export function formatEnrolments(courses: CanvasCourseSummary[]): string {
+  if (courses.length === 0) return 'I could not find any enrolments for this profile.'
+
+  return [
+    'Here are the enrolments I found:',
+    '',
+    ...courses.map((course, index) => {
+      const name = course.course_name || course.name || 'Untitled course'
+      const status = course.status || course.workflow_state || 'status not supplied'
+      return `${index + 1}. ${name} - ${status}`
+    }),
+  ].join('\n')
+}
+
+export function formatSupport(): string {
+  return [
+    'For student support, contact your course support team or student services through your normal Canvas support channel.',
+    '',
+    'I can still help summarize your available Canvas profile, courses, enrolments, and grades from the connected MCP data.',
+  ].join('\n')
+}
+
+export function formatUnavailableFeature(feature: string, reason: string): string {
+  return [
+    `${feature} is not available in Nexi yet.`,
+    '',
+    reason,
   ].join('\n')
 }

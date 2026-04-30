@@ -8,11 +8,24 @@ export type MessageSource =
   | 'out_of_scope'
   | 'escalation'
   | 'auth_required'
-export type ChatIntent = 'lookup_profile' | 'see_courses' | 'view_exam_results'
+export type ChatIntent =
+  | 'lookup_profile'
+  | 'verify_otp'
+  | 'view_profile'
+  | 'see_courses'
+  | 'see_enrolments'
+  | 'view_assignments'
+  | 'view_deadlines'
+  | 'view_grades'
+  | 'view_exam_results'
+  | 'view_announcements'
+  | 'get_support'
 
 export interface ChatAction {
-  id: Exclude<ChatIntent, 'lookup_profile'>
+  id: Exclude<ChatIntent, 'lookup_profile' | 'verify_otp'>
   label: string
+  disabled?: boolean
+  reason?: string
 }
 
 export interface CanvasUserProfile {
@@ -23,12 +36,15 @@ export interface CanvasUserProfile {
   status?: string
   enrolments: Array<{
     course_id?: string | number
+    id?: string | number
     course_name?: string
     name?: string
     status?: string
+    workflow_state?: string
   }>
   completed_modules: Array<{
     module_id?: string | number
+    id?: string | number
     module_name?: string
     name?: string
     course_id?: string | number

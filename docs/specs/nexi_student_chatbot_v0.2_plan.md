@@ -181,3 +181,15 @@ These are not v0.2 commitments unless explicitly promoted:
 8. Add course context and Q&A handling.
 9. Add tests and fixtures.
 10. Update docs and GitHub issues as each milestone lands.
+
+## Implementation Progress
+
+First v0.2 branch pass (`feat/nexi-v0.2`):
+
+- Added `NEXI_*` runtime config and production guard.
+- Added in-memory `StudentSession` state keyed by `session_id`.
+- Added simulated OTP verification with retry tracking.
+- Moved raw Canvas MCP tool calls behind a student-safe adapter.
+- Reworked Canvas chat flow into email lookup -> OTP -> verified dashboard.
+- Added dashboard buttons with disabled reasons for MCP capabilities that are not available yet.
+- Kept assignments, deadlines, announcements, selected course context, and Q&A as the next implementation slice.

@@ -50,7 +50,7 @@ export default function ChatInput({ onSend, disabled, placeholder }: Props) {
         </button>
       </div>
       <p className="mt-1 text-center text-xs text-gray-400">
-        Demo mode uses email lookup through Canvas MCP. We will lock this down before production.
+        Prototype mode uses Canvas MCP lookup plus a simulated OTP before showing student data.
       </p>
     </div>
   )

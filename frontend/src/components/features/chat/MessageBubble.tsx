@@ -34,10 +34,23 @@ export default function MessageBubble({ message, onAction }: Props) {
               <button
                 key={action.id}
                 type="button"
-                onClick={() => onAction?.(action)}
-                className="rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                onClick={() => {
+                  if (!action.disabled) onAction?.(action)
+                }}
+                disabled={action.disabled}
+                title={action.reason}
+                className={`rounded-md border px-3 py-1.5 text-left text-xs font-medium ${
+                  action.disabled
+                    ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
+                    : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                }`}
               >
-                {action.label}
+                <span className="block">{action.label}</span>
+                {action.disabled && action.reason && (
+                  <span className="mt-0.5 block max-w-40 text-[11px] font-normal leading-snug text-gray-400">
+                    {action.reason}
+                  </span>
+                )}
               </button>
             ))}
           </div>
