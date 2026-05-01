@@ -1,0 +1,20 @@
+The live MCP server currently advertises 17 tools:
+
+list_courses
+get_my_todo_items
+get_my_course_grades
+get_my_upcoming_assignments
+get_my_submission_status
+get_my_peer_reviews_todo
+get_course_details
+get_user_by_email
+get_user_logins
+get_user_sis_id
+get_user_profile
+list_user_courses
+get_user_exam_results
+get_assignments
+get_announcements
+get_courses
+get_grades
+The SIS-specific tools are active: get_user_by_email, get_user_logins, and get_user_sis_id.
