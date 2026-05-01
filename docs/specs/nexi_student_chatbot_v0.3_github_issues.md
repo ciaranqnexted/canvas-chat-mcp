@@ -17,6 +17,8 @@ Created on May 1, 2026 from `docs/specs/Nexi_Student_Chatbot_Spec_v0.3.md`.
 - Open blocker: [#20 - Expose Stage 1 Student Hub content tools](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/20)
 - Open blocker: [#19 - Re-authenticate Monday connector and sync milestones](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19)
 
+MCP-server handoff prompt: [canvas_mcp_student_hub_v0.3_prompt.md](./canvas_mcp_student_hub_v0.3_prompt.md)
+
 ## Phase 2 Issues
 
 - [#14 - Route personal, support, mixed, and unclear questions](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/14)
@@ -31,9 +33,9 @@ Created on May 1, 2026 from `docs/specs/Nexi_Student_Chatbot_Spec_v0.3.md`.
 
 ## Monday.com Sync
 
-Status: blocked.
+Status: deferred TODO.
 
-The Monday connector returned `token_expired` on May 1, 2026. This is tracked in [#19](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19). After re-authentication, sync these three top-level milestone items:
+The Monday connector returned `token_expired` on May 1, 2026. This is tracked in [#19](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19), but it is not blocking app implementation. After re-authentication, sync these three top-level milestone items:
 
 1. `v0.3 Phase 1 - Student Hub Foundation`
 2. `v0.3 Phase 2 - Routing And Grounded Hub Answers`

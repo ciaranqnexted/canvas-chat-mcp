@@ -118,7 +118,7 @@ Acceptance criteria:
 
 Target: sync the three top-level milestones above as monday.com items.
 
-Current blocker: the monday.com connector returned `token_expired` on May 1, 2026. This is tracked in [#19](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19). Re-authenticate the Monday connector, then sync each milestone with links back to the matching GitHub milestone and issue set.
+Current status: deferred TODO. The monday.com connector returned `token_expired` on May 1, 2026. This is tracked in [#19](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19), but it is not blocking app implementation. Re-authenticate the Monday connector later, then sync each milestone with links back to the matching GitHub milestone and issue set.
 
 GitHub milestone URLs:
 
@@ -132,10 +132,11 @@ GitHub milestone URLs:
 2. Add Student Hub config and type support.
 3. Add dashboard action and fallback support route.
 4. Add MCP adapter methods for Stage 1 tools.
-5. Add routing helpers and answer formatting.
-6. Add Stage 2 search integration when MCP tools are live.
-7. Add Stage 3 file support when MCP tools are live.
-8. Run typecheck, lint, build, masked MCP checks, and Vercel smoke checks.
+5. Use [canvas_mcp_student_hub_v0.3_prompt.md](./canvas_mcp_student_hub_v0.3_prompt.md) to update the Canvas MCP server with Stage 1 Student Hub content tools.
+6. Add routing helpers and answer formatting.
+7. Add Stage 2 search integration when MCP tools are live.
+8. Add Stage 3 file support when MCP tools are live.
+9. Run typecheck, lint, build, masked MCP checks, and Vercel smoke checks.
 
 ## Testing Plan
 
