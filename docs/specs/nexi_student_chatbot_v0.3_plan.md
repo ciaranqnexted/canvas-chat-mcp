@@ -99,6 +99,8 @@ Acceptance criteria:
 - [#12 - `[v0.3] Add Student Hub dashboard action and empty-course availability`](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/12)
 - [#11 - `[v0.3] Add Canvas MCP Student Hub content adapter`](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/11)
 - [#10 - `[v0.3] Track missing MCP content-tool capability states`](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/10)
+- [#20 - `[v0.3][MCP blocker] Expose Stage 1 Student Hub content tools`](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/20)
+- [#19 - `[v0.3][Project sync] Re-authenticate Monday connector and sync milestones`](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19)
 
 ### Phase 2
 
@@ -116,7 +118,7 @@ Acceptance criteria:
 
 Target: sync the three top-level milestones above as monday.com items.
 
-Current blocker: the monday.com connector returned `token_expired` on May 1, 2026. Re-authenticate the Monday connector, then sync each milestone with links back to the matching GitHub milestone and issue set.
+Current blocker: the monday.com connector returned `token_expired` on May 1, 2026. This is tracked in [#19](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19). Re-authenticate the Monday connector, then sync each milestone with links back to the matching GitHub milestone and issue set.
 
 GitHub milestone URLs:
 
