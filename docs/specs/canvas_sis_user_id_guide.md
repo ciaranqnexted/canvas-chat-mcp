@@ -100,19 +100,23 @@ type StudentProfile = {
 
 ## Nexi Implementation Status
 
-The chatbot now treats `sis_user_id` as the preferred student number.
+The chatbot now treats `sis_user_id` as the preferred student number and
+uses `account.name` as the Canvas account name in the welcome message.
 
 Lookup behavior:
 
 1.  Call the configured Canvas MCP profile lookup.
 2.  Normalize `sis_user_id` from the returned user object when present.
-3.  If the profile response is valid but does not include SIS, make a
-    best-effort enrichment call to:
+3.  If the profile response is valid but does not include SIS or the
+    Canvas account name, make a best-effort enrichment call to:
 
         get_user_by_email({ email })
 
 4.  If SIS is still unavailable, keep the Canvas user ID for the session
     and display that the SIS ID was not returned by Canvas.
+5.  If `account.name` is returned, display it in the welcome copy:
+
+        Welcome NAME, to the Technology & Design (T&D) chatbot.
 
 The app also checks common compatibility aliases and nested shapes:
 
@@ -136,12 +140,18 @@ get_user_by_email({ email }) -> {
     name: string;
     email: string;
     sis_user_id?: string | null;
-  }
+  };
+  account?: {
+    id?: number | string;
+    name?: string;
+  };
 }
 ```
 
 The existing `get_user_profile({ email })` can also satisfy this
-requirement if it returns `user.sis_user_id` or `profile.sis_user_id`.
+requirement if it returns `user.sis_user_id` or `profile.sis_user_id`,
+and either `account.name`, `profile.account.name`, or
+`profile.canvas_account_name`.
 
 No separate MCP tool is needed if either of those tools returns
 `sis_user_id`. If the field is missing even though the user exists, the

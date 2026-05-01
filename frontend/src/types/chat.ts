@@ -41,6 +41,7 @@ export interface CanvasUserProfile {
   email?: string
   sis_user_id?: string
   sis_id?: string
+  canvas_account_id?: string | number
   canvas_account_name?: string
   status?: string
   timezone?: string

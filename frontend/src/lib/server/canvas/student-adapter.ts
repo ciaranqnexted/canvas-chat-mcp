@@ -53,6 +53,7 @@ export interface CanvasUserProfile {
   email?: string
   sis_user_id?: string
   sis_id?: string
+  canvas_account_id?: string | number
   canvas_account_name?: string
   status?: string
   timezone?: string
@@ -263,6 +264,13 @@ function normalizeProfile(raw: unknown, email: string): CanvasUserProfile | null
     email: asString(profile.email) ?? asString(profileUser.email) ?? asString(root.email) ?? email,
     sis_user_id: sisUserId,
     sis_id: sisUserId,
+    canvas_account_id:
+      asId(profile.canvas_account_id) ??
+      asId(profile.canvasAccountId) ??
+      asId(root.canvas_account_id) ??
+      asId(root.canvasAccountId) ??
+      asId(profileAccount.id) ??
+      asId(rootAccount.id),
     canvas_account_name:
       asString(profile.canvas_account_name) ??
       asString(profile.canvasAccountName) ??
@@ -355,6 +363,7 @@ function mergeProfiles(
     email: primary.email ?? supplemental.email,
     sis_user_id: sisUserId,
     sis_id: sisUserId,
+    canvas_account_id: primary.canvas_account_id ?? supplemental.canvas_account_id,
     canvas_account_name: primary.canvas_account_name ?? supplemental.canvas_account_name,
     status: primary.status ?? supplemental.status,
     timezone: primary.timezone ?? supplemental.timezone,
@@ -371,10 +380,14 @@ async function tryFindCanvasUserByEmail(email: string): Promise<CanvasUserProfil
     const raw = await callCanvasMcpTool('get_user_by_email', { email })
     return normalizeProfile(raw, email)
   } catch (error) {
-    // SIS enrichment should never block a profile that was already found.
+    // Profile enrichment should never block a profile that was already found.
     if (isMissingToolError(error)) return undefined
     return undefined
   }
+}
+
+function needsProfileEnrichment(profile: CanvasUserProfile): boolean {
+  return !profile.sis_user_id || !profile.canvas_account_name
 }
 
 export async function findCanvasUserByEmail(email: string): Promise<CanvasUserProfile | null> {
@@ -384,7 +397,7 @@ export async function findCanvasUserByEmail(email: string): Promise<CanvasUserPr
   ])
 
   const profile = normalizeProfile(raw, email)
-  if (!profile || profile.sis_user_id) return profile
+  if (!profile || !needsProfileEnrichment(profile)) return profile
 
   const userByEmailProfile = await tryFindCanvasUserByEmail(email)
   if (!userByEmailProfile) return profile
