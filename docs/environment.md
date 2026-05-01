@@ -61,6 +61,27 @@ Canvas MCP access is wired through the server-only student adapter. The current 
 
 If `list_user_courses` or `get_user_exam_results` are unavailable, the app falls back to course/module data returned by `get_user_profile`.
 
+## Student Hub Configuration
+
+These variables control the v0.3 AIT Student Hub feature. Defaults are built in, but set them explicitly in `frontend/.env.local` and Vercel so deployments are self-documenting.
+
+| Variable | Where to get it | Used by | Notes |
+|---|---|---|---|
+| `NEXI_STUDENT_HUB_COURSE_ID` | Canvas course URL | Student Hub MCP calls | v0.3 default: `5704` |
+| `NEXI_STUDENT_HUB_ACCOUNT_ID` | Canvas account settings | Student Hub labels/docs | v0.3 default: `1` |
+| `NEXI_STUDENT_HUB_ACCOUNT_NAME` | Canvas account settings | Student Hub labels/docs | v0.3 default: `Technology & Design (T&D)` |
+| `NEXI_STUDENT_HUB_NAME` | Product wording | Dashboard action and answers | v0.3 default: `AIT Student Hub` |
+| `NEXI_STUDENT_HUB_CANVAS_URL` | Canvas course URL | Answer links | v0.3 default: `https://ait.instructure.com/courses/5704` |
+
+The Student Hub content path requires these MCP tools before full hub Q&A can work:
+
+- `get_course_pages`
+- `get_course_page`
+- `get_course_modules`
+- `get_module_items`
+
+Until those tools are exposed by the Canvas MCP server, Nexi shows the Student Hub action but returns a clear setup message rather than failing the chat flow.
+
 ## Why You See `canvasAuth=missing_config`
 
 The sign-in route redirects to:

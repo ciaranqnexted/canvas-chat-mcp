@@ -20,10 +20,11 @@ import {
   formatOtpPrompt,
   formatProfile,
   formatStudentDashboard,
-  formatSupport,
+  formatStudentHubOverview,
   formatUnavailableFeature,
   getCoursesForProfile,
   getExamResultsForProfile,
+  getStudentHubOverview,
   isLikelyEmail,
   lookupProfileByEmail,
   profileActions,
@@ -137,7 +138,7 @@ function inferCanvasIntent(message: string): ChatIntent | undefined {
   if (/\b(assignment|assignments)\b/.test(text)) return 'view_assignments'
   if (/\b(deadline|deadlines|due date|due dates)\b/.test(text)) return 'view_deadlines'
   if (/\b(announcement|announcements)\b/.test(text)) return 'view_announcements'
-  if (/\b(help|support|contact)\b/.test(text)) return 'get_support'
+  if (/\b(student hub|hub|student services|help|support|contact)\b/.test(text)) return 'open_student_hub'
 
   return undefined
 }
@@ -215,8 +216,14 @@ async function handleVerifiedCanvasMessage(
     return canvasResponse(sessionId, formatExamResults(results), session, 1)
   }
 
+  if (effectiveIntent === 'open_student_hub') {
+    const overview = await getStudentHubOverview()
+    return canvasResponse(sessionId, formatStudentHubOverview(overview), session, 1, actions)
+  }
+
   if (effectiveIntent === 'get_support') {
-    return canvasResponse(sessionId, formatSupport(), session, 0)
+    const overview = await getStudentHubOverview()
+    return canvasResponse(sessionId, formatStudentHubOverview(overview), session, 1, actions)
   }
 
   return canvasResponse(

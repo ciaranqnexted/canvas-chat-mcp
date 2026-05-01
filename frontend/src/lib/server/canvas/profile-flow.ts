@@ -4,10 +4,13 @@ import {
   findCanvasUserByEmail,
   getCanvasCourses,
   getCanvasExamResults,
+  getCanvasStudentHubOverview,
+  type CanvasStudentHubOverview,
   type CanvasCompletedModule,
   type CanvasCourseSummary,
   type CanvasUserProfile,
 } from './student-adapter'
+import { getStudentHubConfig } from './student-hub-config'
 
 export type CanvasProfileActionId =
   | 'select_course'
@@ -19,6 +22,7 @@ export type CanvasProfileActionId =
   | 'view_grades'
   | 'view_exam_results'
   | 'view_announcements'
+  | 'open_student_hub'
   | 'get_support'
 
 export interface CanvasProfileAction {
@@ -106,6 +110,9 @@ export function profileActions(profile: CanvasUserProfile): CanvasProfileAction[
 
   return [
     { id: 'view_profile', label: 'Profile' },
+    canvasStudentCapabilities.studentHub
+      ? { id: 'open_student_hub', label: getStudentHubConfig().name }
+      : disabledAction('open_student_hub', getStudentHubConfig().name, 'Student Hub is not configured yet.'),
     hasCourses
       ? { id: 'see_courses', label: 'Courses' }
       : disabledAction('see_courses', 'Courses', noCoursesReason),
@@ -124,7 +131,6 @@ export function profileActions(profile: CanvasUserProfile): CanvasProfileAction[
     canvasStudentCapabilities.announcements
       ? { id: 'view_announcements', label: 'Announcements' }
       : disabledAction('view_announcements', 'Announcements', 'Announcement lookup is not connected yet.'),
-    { id: 'get_support', label: 'Support' },
   ]
 }
 
@@ -142,6 +148,10 @@ export async function getExamResultsForProfile(
   profile: CanvasUserProfile
 ): Promise<CanvasCompletedModule[]> {
   return getCanvasExamResults(profile)
+}
+
+export async function getStudentHubOverview(): Promise<CanvasStudentHubOverview> {
+  return getCanvasStudentHubOverview()
 }
 
 export function courseSelectionActions(courses: CanvasCourseSummary[]): CanvasProfileAction[] {
@@ -180,7 +190,7 @@ export function formatStudentDashboard(profile: CanvasUserProfile): string {
   return [
     formatProfileWelcome(profile),
     '',
-    'Choose an option below or ask for courses, enrolments, grades, deadlines, announcements, or support.',
+    'Choose an option below or ask for courses, enrolments, grades, deadlines, announcements, or Student Hub support.',
   ].join('\n')
 }
 
@@ -242,11 +252,64 @@ export function formatCourseSelected(courseName: string): string {
   ].join('\n')
 }
 
-export function formatSupport(): string {
+export function formatStudentHubOverview(overview: CanvasStudentHubOverview): string {
+  const missingTools = overview.missing_tools.join(', ')
+  const failedTools = overview.failed_tools.join(', ')
+  const sourceReference = `${overview.name} > Course ${overview.course_id}`
+
+  if (overview.pages.length === 0 && overview.modules.length === 0) {
+    const setupLine = missingTools
+      ? `The Canvas MCP server still needs these Student Hub content tools: ${missingTools}.`
+      : failedTools
+        ? `The Student Hub content request failed for: ${failedTools}.`
+        : 'No Student Hub pages or modules were returned yet.'
+
+    return [
+      `${overview.name} is configured for ${overview.account_name}.`,
+      '',
+      setupLine,
+      `Source reference: ${sourceReference}`,
+      `Canvas link: ${overview.canvas_url}`,
+      '',
+      'Suggested next actions: open the hub in Canvas, or ask me for your profile, courses, enrolments, or grades while the hub content tools are being completed.',
+    ].join('\n')
+  }
+
+  const moduleNames = overview.modules
+    .map(module => module.name)
+    .filter((name): name is string => Boolean(name))
+    .slice(0, 4)
+  const pageTitles = overview.pages
+    .map(page => page.title)
+    .filter((title): title is string => Boolean(title))
+    .slice(0, 4)
+  const moduleLine = moduleNames.length > 0
+    ? `Modules found: ${moduleNames.join(', ')}.`
+    : 'No modules were returned.'
+  const pageLine = pageTitles.length > 0
+    ? `Pages found: ${pageTitles.join(', ')}.`
+    : 'No pages were returned.'
+
   return [
-    'For student support, contact your course support team or student services through your normal Canvas support channel.',
+    `${overview.name} is ready as the student support knowledge base.`,
     '',
-    'I can still help summarize your available Canvas profile, courses, enrolments, and grades from the connected MCP data.',
+    moduleLine,
+    pageLine,
+    `Source reference: ${sourceReference}`,
+    `Canvas link: ${overview.canvas_url}`,
+    '',
+    'Suggested next actions: ask a support question about enrolment, assessments, results, policies, or student services.',
+  ].join('\n')
+}
+
+export function formatSupport(): string {
+  const hub = getStudentHubConfig()
+
+  return [
+    `${hub.name} is the student support knowledge base for this chatbot.`,
+    `Canvas link: ${hub.canvasUrl}`,
+    '',
+    'I can also help summarize your available Canvas profile, courses, enrolments, and grades from the connected MCP data.',
   ].join('\n')
 }
 

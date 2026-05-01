@@ -1,4 +1,5 @@
 import { callCanvasMcpTool } from './mcp-http-client'
+import { getStudentHubConfig } from './student-hub-config'
 
 export interface CanvasCourseSummary {
   course_id?: string | number
@@ -45,6 +46,45 @@ export interface CanvasAnnouncementSummary {
   posted_at?: string | null
 }
 
+export interface CanvasHubPageSummary {
+  page_id?: string | number
+  id?: string | number
+  title?: string
+  url?: string
+  html_url?: string
+  body?: string
+}
+
+export interface CanvasHubModuleItem {
+  item_id?: string | number
+  id?: string | number
+  title?: string
+  type?: string
+  page_url?: string
+  html_url?: string
+  url?: string
+}
+
+export interface CanvasHubModuleSummary {
+  module_id?: string | number
+  id?: string | number
+  name?: string
+  position?: number
+  items?: CanvasHubModuleItem[]
+}
+
+export interface CanvasStudentHubOverview {
+  course_id: string
+  account_id: string
+  account_name: string
+  name: string
+  canvas_url: string
+  pages: CanvasHubPageSummary[]
+  modules: CanvasHubModuleSummary[]
+  missing_tools: string[]
+  failed_tools: string[]
+}
+
 export interface CanvasUserProfile {
   user_id?: string | number
   id?: string | number
@@ -72,6 +112,7 @@ export type CanvasStudentCapability =
   | 'announcements'
   | 'deadlines'
   | 'support'
+  | 'studentHub'
 
 type ToolCandidate = {
   name: string
@@ -87,6 +128,7 @@ export const canvasStudentCapabilities: Record<CanvasStudentCapability, boolean>
   announcements: false,
   deadlines: false,
   support: true,
+  studentHub: true,
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -343,6 +385,60 @@ function normalizeAnnouncements(raw: unknown): CanvasAnnouncementSummary[] {
   )
 }
 
+function normalizeHubPages(raw: unknown): CanvasHubPageSummary[] {
+  const record = asRecord(raw)
+  const pages = asArray<Record<string, unknown>>(
+    record.pages ?? record.wiki_pages ?? record.items ?? raw
+  )
+
+  return pages
+    .map(page => ({
+      page_id: asId(page.page_id) ?? asId(page.id),
+      id: asId(page.id) ?? asId(page.page_id),
+      title: firstString(page.title, page.name, page.display_name),
+      url: firstString(page.url, page.page_url, page.html_url),
+      html_url: firstString(page.html_url, page.url),
+      body: asString(page.body),
+    }))
+    .filter(page => page.title || page.url || page.page_id || page.id)
+}
+
+function normalizeHubModuleItems(raw: unknown): CanvasHubModuleItem[] {
+  const record = asRecord(raw)
+  const items = asArray<Record<string, unknown>>(
+    record.module_items ?? record.items ?? raw
+  )
+
+  return items
+    .map(item => ({
+      item_id: asId(item.item_id) ?? asId(item.id),
+      id: asId(item.id) ?? asId(item.item_id),
+      title: firstString(item.title, item.name),
+      type: firstString(item.type, item.content_type),
+      page_url: firstString(item.page_url, item.pageUrl),
+      html_url: firstString(item.html_url, item.url),
+      url: firstString(item.url, item.html_url),
+    }))
+    .filter(item => item.title || item.url || item.page_url || item.item_id || item.id)
+}
+
+function normalizeHubModules(raw: unknown): CanvasHubModuleSummary[] {
+  const record = asRecord(raw)
+  const modules = asArray<Record<string, unknown>>(
+    record.modules ?? record.items ?? raw
+  )
+
+  return modules
+    .map(module => ({
+      module_id: asId(module.module_id) ?? asId(module.id),
+      id: asId(module.id) ?? asId(module.module_id),
+      name: firstString(module.name, module.title),
+      position: asNumber(module.position),
+      items: normalizeHubModuleItems(module.items ?? module.module_items),
+    }))
+    .filter(module => module.name || module.module_id || module.id)
+}
+
 export function canvasUserId(profile: CanvasUserProfile): string | undefined {
   const id = profile.canvas_user_id ?? profile.user_id ?? profile.id
   return id === undefined || id === null ? undefined : String(id)
@@ -463,4 +559,108 @@ export async function getCanvasAnnouncements(
   ])
 
   return normalizeAnnouncements(raw)
+}
+
+function hubCourseId(courseId?: string | number): string {
+  const id = asId(courseId) ?? getStudentHubConfig().courseId
+  return String(id)
+}
+
+function trackHubToolFailure(
+  error: unknown,
+  toolName: string,
+  missingTools: string[],
+  failedTools: string[]
+): void {
+  if (isMissingToolError(error)) {
+    missingTools.push(toolName)
+    return
+  }
+
+  failedTools.push(toolName)
+}
+
+export async function getCanvasStudentHubPages(
+  courseId?: string | number,
+  includeBody = false
+): Promise<CanvasHubPageSummary[]> {
+  const raw = await callCanvasMcpTool('get_course_pages', {
+    course_id: hubCourseId(courseId),
+    include_body: includeBody,
+  })
+
+  return normalizeHubPages(raw)
+}
+
+export async function getCanvasStudentHubPage(
+  pageUrlOrId: string,
+  courseId?: string | number
+): Promise<CanvasHubPageSummary | null> {
+  const pageKey = /^\d+$/.test(pageUrlOrId) ? 'page_id' : 'page_url'
+  const raw = await callCanvasMcpTool('get_course_page', {
+    course_id: hubCourseId(courseId),
+    [pageKey]: pageUrlOrId,
+  })
+
+  return normalizeHubPages(raw)[0] ?? null
+}
+
+export async function getCanvasStudentHubModules(
+  courseId?: string | number
+): Promise<CanvasHubModuleSummary[]> {
+  const raw = await callCanvasMcpTool('get_course_modules', {
+    course_id: hubCourseId(courseId),
+  })
+
+  return normalizeHubModules(raw)
+}
+
+export async function getCanvasStudentHubModuleItems(
+  moduleId: string | number,
+  courseId?: string | number
+): Promise<CanvasHubModuleItem[]> {
+  const raw = await callCanvasMcpTool('get_module_items', {
+    course_id: hubCourseId(courseId),
+    module_id: moduleId,
+  })
+
+  return normalizeHubModuleItems(raw)
+}
+
+export async function getCanvasStudentHubOverview(): Promise<CanvasStudentHubOverview> {
+  const config = getStudentHubConfig()
+  const missingTools: string[] = []
+  const failedTools: string[] = []
+
+  let pages: CanvasHubPageSummary[] = []
+  let modules: CanvasHubModuleSummary[] = []
+
+  const [pagesResult, modulesResult] = await Promise.allSettled([
+    getCanvasStudentHubPages(config.courseId),
+    getCanvasStudentHubModules(config.courseId),
+  ] as const)
+
+  if (pagesResult.status === 'fulfilled') {
+    pages = pagesResult.value
+  } else {
+    trackHubToolFailure(pagesResult.reason, 'get_course_pages', missingTools, failedTools)
+  }
+
+  if (modulesResult.status === 'fulfilled') {
+    modules = modulesResult.value
+  } else {
+    trackHubToolFailure(modulesResult.reason, 'get_course_modules', missingTools, failedTools)
+  }
+
+  return {
+    course_id: config.courseId,
+    account_id: config.accountId,
+    account_name: config.accountName,
+    name: config.name,
+    canvas_url: config.canvasUrl,
+    pages,
+    modules,
+    missing_tools: missingTools,
+    failed_tools: failedTools,
+  }
 }

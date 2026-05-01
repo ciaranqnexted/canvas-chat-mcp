@@ -20,6 +20,7 @@ export type ChatIntent =
   | 'view_grades'
   | 'view_exam_results'
   | 'view_announcements'
+  | 'open_student_hub'
   | 'get_support'
 
 export interface ChatAction {
