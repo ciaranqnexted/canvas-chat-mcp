@@ -4,7 +4,7 @@ Created on May 1, 2026 from `docs/specs/Nexi_Student_Chatbot_Spec_v0.3.md`.
 
 ## Milestones
 
-- [v0.3 Phase 1 - Student Hub Foundation](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/4)
+- Closed: [v0.3 Phase 1 - Student Hub Foundation](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/4)
 - [v0.3 Phase 2 - Routing And Grounded Hub Answers](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/5)
 - [v0.3 Phase 3 - Search, Files, QA, And Release](https://github.com/ciaranqnexted/canvas-chat-mcp/milestone/6)
 
@@ -14,8 +14,8 @@ Created on May 1, 2026 from `docs/specs/Nexi_Student_Chatbot_Spec_v0.3.md`.
 - Closed: [#12 - Add Student Hub dashboard action and empty-course availability](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/12)
 - Closed: [#11 - Add Canvas MCP Student Hub content adapter](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/11)
 - Closed: [#10 - Track missing MCP content-tool capability states](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/10)
-- Open blocker: [#20 - Expose Stage 1 Student Hub content tools](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/20)
-- Open blocker: [#19 - Re-authenticate Monday connector and sync milestones](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19)
+- Closed: [#20 - Expose Stage 1 Student Hub content tools](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/20)
+- Deferred TODO: [#19 - Re-authenticate Monday connector and sync milestones](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19)
 
 MCP-server handoff prompt: [canvas_mcp_student_hub_v0.3_prompt.md](./canvas_mcp_student_hub_v0.3_prompt.md)
 
@@ -35,7 +35,7 @@ MCP-server handoff prompt: [canvas_mcp_student_hub_v0.3_prompt.md](./canvas_mcp_
 
 Status: deferred TODO.
 
-The Monday connector returned `token_expired` on May 1, 2026. This is tracked in [#19](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19), but it is not blocking app implementation. After re-authentication, sync these three top-level milestone items:
+The Monday connector returned `token_expired` on May 1, 2026. This is tracked in [#19](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/19), but it is not blocking app implementation and has been moved out of the Phase 1 milestone. After re-authentication, sync these three top-level milestone items:
 
 1. `v0.3 Phase 1 - Student Hub Foundation`
 2. `v0.3 Phase 2 - Routing And Grounded Hub Answers`
