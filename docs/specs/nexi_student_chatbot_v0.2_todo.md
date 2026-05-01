@@ -17,11 +17,13 @@ GitHub issues:
 | [#1](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/1) | `[v0.2] Verified student session with simulated OTP` | v0.2 Phase 1 | Closed |
 | [#4](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/4) | `[v0.2] Personalised dashboard and dynamic buttons` | v0.2 Phase 1 | Closed |
 | [#3](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/3) | `[v0.2] Canvas MCP adapter and student-safe tool normalization` | v0.2 Phase 1 | Closed |
-| [#2](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/2) | `[v0.2] Assignments, deadlines, grades, announcements, and enrolments` | v0.2 Phase 2 | Open |
-| [#8](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/8) | `[v0.2] Course Q&A and context maintenance` | v0.2 Phase 2 | Open |
-| [#7](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/7) | `[v0.2] Guardrails, privacy, and production hardening` | v0.2 Phase 3 | Open |
-| [#6](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/6) | `[v0.2] Acceptance tests and regression coverage` | v0.2 Phase 3 | Open |
+| [#2](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/2) | `[v0.2] Assignments, deadlines, grades, announcements, and enrolments` | v0.2 Phase 2 | Closed |
+| [#8](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/8) | `[v0.2] Course Q&A and context maintenance` | v0.2 Phase 2 | Closed |
+| [#7](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/7) | `[v0.2] Guardrails, privacy, and production hardening` | v0.2 Phase 3 | Closed |
+| [#6](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/6) | `[v0.2] Acceptance tests and regression coverage` | v0.2 Phase 3 | Closed |
 | [#5](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/5) | `[implementation record] Prototype v0.1 Canvas MCP chatbot` | v0.2 Phase 1 | Closed |
+
+Closeout note: all v0.2 issues and milestones are closed on GitHub. Remaining academic, Q&A, automated testing, and production hardening work should be opened as narrower issues in the next milestone.
 
 ### 1. Verified student session with simulated OTP
 
@@ -96,7 +98,7 @@ Acceptance tests:
 
 GitHub issue: [#2](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/2)
 
-Status: planned
+Status: closed on GitHub as part of the v0.2 baseline. Courses/enrolments, grades/results, SIS, and account enrichment are working; remaining assignment, deadline, and announcement UI work moves to the next milestone.
 
 Tasks:
 
@@ -120,7 +122,7 @@ Acceptance tests:
 
 GitHub issue: [#8](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/8)
 
-Status: partially implemented
+Status: closed on GitHub as part of the v0.2 baseline. Course selection and `selectedCourseId` persistence are implemented; full natural-language course Q&A moves to the next milestone.
 
 Tasks:
 
@@ -140,7 +142,7 @@ Acceptance tests:
 
 GitHub issue: [#7](https://github.com/ciaranqnexted/canvas-chat-mcp/issues/7)
 
-Status: planned
+Status: closed on GitHub as part of the v0.2 baseline. Prototype guardrails are in place; production auth, privacy review, and rate limiting move to the next milestone.
 
 Tasks:
 
