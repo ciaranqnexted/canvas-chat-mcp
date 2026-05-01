@@ -585,7 +585,7 @@ export async function getCanvasStudentHubPages(
   includeBody = false
 ): Promise<CanvasHubPageSummary[]> {
   const raw = await callCanvasMcpTool('get_course_pages', {
-    course_id: hubCourseId(courseId),
+    course_identifier: hubCourseId(courseId),
     include_body: includeBody,
   })
 
@@ -596,10 +596,9 @@ export async function getCanvasStudentHubPage(
   pageUrlOrId: string,
   courseId?: string | number
 ): Promise<CanvasHubPageSummary | null> {
-  const pageKey = /^\d+$/.test(pageUrlOrId) ? 'page_id' : 'page_url'
   const raw = await callCanvasMcpTool('get_course_page', {
-    course_id: hubCourseId(courseId),
-    [pageKey]: pageUrlOrId,
+    course_identifier: hubCourseId(courseId),
+    page_identifier: pageUrlOrId,
   })
 
   return normalizeHubPages(raw)[0] ?? null
@@ -609,7 +608,8 @@ export async function getCanvasStudentHubModules(
   courseId?: string | number
 ): Promise<CanvasHubModuleSummary[]> {
   const raw = await callCanvasMcpTool('get_course_modules', {
-    course_id: hubCourseId(courseId),
+    course_identifier: hubCourseId(courseId),
+    include_items: true,
   })
 
   return normalizeHubModules(raw)
@@ -620,8 +620,9 @@ export async function getCanvasStudentHubModuleItems(
   courseId?: string | number
 ): Promise<CanvasHubModuleItem[]> {
   const raw = await callCanvasMcpTool('get_module_items', {
-    course_id: hubCourseId(courseId),
+    course_identifier: hubCourseId(courseId),
     module_id: moduleId,
+    include_content_details: true,
   })
 
   return normalizeHubModuleItems(raw)
