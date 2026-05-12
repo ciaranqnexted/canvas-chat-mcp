@@ -1,5 +1,7 @@
 # canvas-chat-mcp
 
+**N.E.X.I — NextEd's Enquiry & Xperience Interface**
+
 Student-facing Next.js chatbot for querying either:
 
 - documents in a local folder, for unauthenticated study support
